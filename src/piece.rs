@@ -1,25 +1,25 @@
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Pice {
-    pice_type: Type,
-    pice_color: Colour
+pub struct Piece {
+    piece_type: Type,
+    piece_color: Colour
 }
 
-impl Pice {
-    pub(crate) fn new(pice_type: Type, pice_color: Colour) -> Pice {
-        Pice { pice_type, pice_color }
+impl Piece {
+    pub(crate) fn new(piece_type: Type, piece_color: Colour) -> Piece {
+        Piece { piece_type, piece_color }
     }
-    pub fn get_pice_type(&self) -> Type {
-        self.pice_type
+    pub fn get_piece_type(&self) -> Type {
+        self.piece_type
     }
 
-    pub fn get_pice_color(&self) -> Colour {
-        self.pice_color
+    pub fn get_piece_color(&self) -> Colour {
+        self.piece_color
     }
 
     pub fn get_character_representation(&self) -> char {
-        if self.pice_color.eq(&Colour::White) {
-            match self.pice_type {
+        if self.piece_color.eq(&Colour::White) {
+            match self.piece_type {
                 Type::KING => '♔',
                 Type::QUEEN => '♕',
                 Type::ROOK => '♖',
@@ -30,7 +30,7 @@ impl Pice {
         }
 
         else {
-            match self.pice_type {
+            match self.piece_type {
                 Type::KING => '♚',
                 Type::QUEEN => '♛',
                 Type::ROOK => '♜',

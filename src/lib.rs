@@ -2,10 +2,10 @@
 // Modified by: Isak Larsson
 
 mod tests;
-mod pice;
+mod piece;
 
 use std::fmt;
-use crate::pice::*;
+use crate::piece::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GameState {
@@ -54,7 +54,7 @@ pub trait GameTraits {
 pub struct Game {
     state: GameState,
     turn: Colour,
-    board: [[Option<Pice>; 8]; 8]
+    board: [[Option<Piece>; 8]; 8]
 }
 
 impl GameTraits for Game {
@@ -99,8 +99,8 @@ impl Game {
 
         for row in self.board.iter() {
             for board_position in row.iter() {
-                if let Some(pice) = board_position {
-                    print!("{}", pice.get_character_representation());
+                if let Some(piece) = board_position {
+                    print!("{}", piece.get_character_representation());
                 }
 
                 print!(" ");
@@ -111,21 +111,21 @@ impl Game {
     }
 }
 
-fn create_default_board() -> [[Option<Pice>; 8]; 8] {
+fn create_default_board() -> [[Option<Piece>; 8]; 8] {
     [
-        create_first_layer_pice_row(Colour::Black),
-        [Some(Pice::new(Type::PAWN, Colour::Black)); 8],
+        create_first_layer_piece_row(Colour::Black),
+        [Some(Piece::new(Type::PAWN, Colour::Black)); 8],
         [None; 8],
         [None; 8],
         [None; 8],
         [None; 8],
-        [Some(Pice::new(Type::PAWN, Colour::White)); 8],
-        create_first_layer_pice_row(Colour::White),
+        [Some(Piece::new(Type::PAWN, Colour::White)); 8],
+        create_first_layer_piece_row(Colour::White),
     ]
 }
 
-fn create_first_layer_pice_row(colour: Colour) -> [Option<Pice>; 8] {
-    [Some(Pice::new(Type::ROOK, colour)), Some(Pice::new(Type::KNIGHT, colour)), Some(Pice::new(Type::BISHOP, colour)), Some(Pice::new(Type::KING, colour)), Some(Pice::new(Type::QUEEN, colour)), Some(Pice::new(Type::BISHOP, colour)), Some(Pice::new(Type::KNIGHT,colour)), Some(Pice::new(Type::ROOK,colour))]
+fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
+    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KING, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
 }
 
 
