@@ -5,10 +5,10 @@
 mod tests {
     use crate::Game;
     use crate::GameState;
+    use crate::board::position_to_string;
     use crate::piece::Colour;
     use crate::{GameTraits, create_default_board};
     use std::io;
-    use crate::board::{position_from_string, position_to_string};
 
     // example test
     // check that game state is in progress after initialization
