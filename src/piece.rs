@@ -25,9 +25,27 @@ impl Piece {
     pub(crate) fn get_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
         match self.piece_type {
             Type::PAWN => self.pawn_possible_moves(position, game),
+            Type::KNIGHT => self.knight_possible_moves(position, game),
             _ => todo!(),
         }
     }
+
+    pub(crate) fn knight_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
+        let mut valid_positions: Vec<String> = vec![];
+
+        add_position_if_valid((position.0 + 1, position.1 + 2), game, &mut valid_positions);
+        add_position_if_valid((position.0 + 1, position.1.wrapping_sub(2)), game, &mut valid_positions);
+        add_position_if_valid((position.0.wrapping_sub( 1), position.1 + 2), game, &mut valid_positions);
+        add_position_if_valid((position.0.wrapping_sub(1), position.1.wrapping_sub(2)), game, &mut valid_positions);
+
+        add_position_if_valid((position.0 + 2, position.1 + 1), game, &mut valid_positions);
+        add_position_if_valid((position.0 + 2, position.1.wrapping_sub(1)), game, &mut valid_positions);
+        add_position_if_valid((position.0.wrapping_sub(2), position.1 + 1), game, &mut valid_positions);
+        add_position_if_valid((position.0.wrapping_sub( 2), position.1.wrapping_sub(1)), game, &mut valid_positions);
+
+        valid_positions
+    }
+
 
     pub(crate) fn pawn_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
@@ -97,7 +115,7 @@ fn add_position_if_valid(position: (u8, u8), game: &Game, positions: &mut Vec<St
 }
 
 fn is_valid_position(position: (u8, u8), game: &Game) -> bool {
-    !is_friendly_piece_at(position, &game) && !is_out_of_bounds(position)
+    !is_out_of_bounds(position) && !is_friendly_piece_at(position, &game)
 }
 
 fn is_friendly_piece_at(position: (u8, u8), game: &Game) -> bool {
