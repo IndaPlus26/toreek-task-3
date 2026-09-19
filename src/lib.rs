@@ -99,8 +99,8 @@ impl GameTraits for Game {
 
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
         let position = position_from_string(position);
-        if let Some(piece) = self.get_piece_at(position) {
 
+        if let Some(piece) = self.get_piece_at(position) && piece.get_piece_color() == self.turn {
             piece.get_possible_moves(position, self)
         }
         else {
