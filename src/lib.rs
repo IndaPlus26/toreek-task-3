@@ -3,8 +3,11 @@
 
 mod tests;
 mod piece;
+mod board;
 
 use std::fmt;
+use crate::board::*;
+use crate::GameState::InProgress;
 use crate::piece::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -60,20 +63,23 @@ pub struct Game {
 impl GameTraits for Game {
     fn new() -> Game {
         Game {
-            state: GameState::InProgress,
+            state: InProgress,
             turn: Colour::White,
             board: create_default_board()
         }
     }
 
 
+    //TODO: GAME STATE AND CHECK FOR ILLEGAL MOVES
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
-        todo!()
+        self.move_piece(position_from_string(to), position_from_string(to));
+        
+        Option::from(InProgress)
     }
 
     // or this.
     fn make_promotion(&mut self, piece: &str) -> Option<GameState> {
-        return None;
+        None
     }
 
     fn get_game_state(&self) -> GameState {
@@ -85,7 +91,14 @@ impl GameTraits for Game {
     }
 
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
-        todo!()
+        let position = position_from_string(position);
+        if let Some(piece) = self.get_piece_at(position) {
+
+            piece.get_possible_moves(position, self)
+        }
+        else {
+            vec![]
+        }
     }
 
     fn to_fen(&self) -> String {
@@ -93,36 +106,7 @@ impl GameTraits for Game {
     }
 }
 
-impl Game {
-    fn print_board(&self) {
-        println!();
 
-        for row in self.board.iter() {
-            for board_position in row.iter() {
-                if let Some(piece) = board_position {
-                    print!("{}", piece.get_character_representation());
-                }
-
-                print!(" ");
-            }
-            println!();
-        }
-
-    }
-}
-
-fn create_default_board() -> [[Option<Piece>; 8]; 8] {
-    [
-        create_first_layer_piece_row(Colour::Black),
-        [Some(Piece::new(Type::PAWN, Colour::Black)); 8],
-        [None; 8],
-        [None; 8],
-        [None; 8],
-        [None; 8],
-        [Some(Piece::new(Type::PAWN, Colour::White)); 8],
-        create_first_layer_piece_row(Colour::White),
-    ]
-}
 
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
     [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KING, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
