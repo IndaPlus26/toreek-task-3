@@ -24,19 +24,36 @@ impl Piece {
     //TODO
     pub(crate) fn get_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
         match self.piece_type {
-            _ => self.pawn_possible_moves(position, game),
+            Type::PAWN => self.pawn_possible_moves(position, game),
+            _ => todo!(),
         }
     }
 
     pub(crate) fn pawn_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
+        //White pawns can only move up and black pawn can only move down
         let color_multiplier: i8 = if game.turn == White {1} else {-1};
 
-        let test_position = (position.0, (position.1 as i8 + color_multiplier) as u8);
-        if is_valid_position((test_position), game) {
-            valid_positions.push(position_to_string(test_position));
+        if !is_enemy_piece_at((position.0, (position.1 as i8 + color_multiplier) as u8), game) {
+            add_position_if_valid((position.0, (position.1 as i8 + color_multiplier) as u8), game, &mut valid_positions);
         }
+
+        //Check if pawn can be moved two pieces ahead
+        if (game.turn == White && position.1 == 2) || (game.turn == Black && position.1== 7) {
+            if !is_enemy_piece_at((position.0, (position.1 as i8 + color_multiplier * 2) as u8), game) {
+                add_position_if_valid((position.0, (position.1 as i8 + color_multiplier * 2) as u8), game, &mut valid_positions);
+            }
+        }
+
+        if is_enemy_piece_at((position.0 + 1, (position.1 as i8 + color_multiplier) as u8), game) {
+            add_position_if_valid((position.0 + 1, (position.1 as i8 + color_multiplier) as u8), game, &mut valid_positions);
+        }
+
+        if is_enemy_piece_at((position.0 - 1, (position.1 as i8 + color_multiplier) as u8), game) {
+            add_position_if_valid((position.0 - 1, (position.1 as i8 + color_multiplier) as u8), game, &mut valid_positions);
+        }
+
 
         valid_positions
     }
@@ -68,6 +85,17 @@ impl Piece {
     }
 }
 
+fn add_position_if_valid(position: (u8, u8), game: &Game, positions: &mut Vec<String>) -> bool {
+    if is_valid_position(position, game) {
+            positions.push(position_to_string(position));
+        true
+    }
+    else {
+        false
+    }
+
+}
+
 fn is_valid_position(position: (u8, u8), game: &Game) -> bool {
     !is_friendly_piece_at(position, &game) && !is_out_of_bounds(position)
 }
@@ -87,7 +115,11 @@ fn is_friendly_piece_at(position: (u8, u8), game: &Game) -> bool {
 }
 
 fn is_enemy_piece_at(position: (u8, u8), game: &Game) -> bool {
-    if let Some(piece) = game.get_piece_at(position) {
+    if is_out_of_bounds(position) {
+         false
+    }
+
+    else if let Some(piece) = game.get_piece_at(position) {
         if piece.piece_color != game.turn {
             true
         }
