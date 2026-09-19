@@ -1,7 +1,11 @@
 // Author: Viola Söderlund
 // Modified by: Isak Larsson
 
+mod tests;
+mod pice;
+
 use std::fmt;
+use crate::pice::*;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GameState {
@@ -9,12 +13,6 @@ pub enum GameState {
     Check,
     Promoting,
     GameOver
-}
-
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum Colour {
-    White,
-    Black,
 }
 
 pub trait GameTraits {
@@ -54,20 +52,20 @@ pub trait GameTraits {
 */
 
 pub struct Game {
-    /* board representation, active colour, ... */
-    // suggestion, can be removed.
     state: GameState,
     turn: Colour,
+    board: [[Option<Pice>; 8]; 8]
 }
 
 impl GameTraits for Game {
-    // Like this example.
     fn new() -> Game {
-        return Game {
+        Game {
             state: GameState::InProgress,
             turn: Colour::White,
-        };
+            board: create_default_board()
+        }
     }
+
 
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
         todo!()
@@ -79,11 +77,11 @@ impl GameTraits for Game {
     }
 
     fn get_game_state(&self) -> GameState {
-        todo!()
+        self.state
     }
 
     fn get_turn(&self) -> Colour {
-        todo!()
+        self.turn
     }
 
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
@@ -93,8 +91,41 @@ impl GameTraits for Game {
     fn to_fen(&self) -> String {
         todo!()
     }
+}
 
+impl Game {
+    fn print_board(&self) {
+        println!();
 
+        for row in self.board.iter() {
+            for board_position in row.iter() {
+                if let Some(pice) = board_position {
+                    print!("{}", pice.get_character_representation());
+                }
+
+                print!(" ");
+            }
+            println!();
+        }
+
+    }
+}
+
+fn create_default_board() -> [[Option<Pice>; 8]; 8] {
+    [
+        create_first_layer_pice_row(Colour::Black),
+        [Some(Pice::new(Type::PAWN, Colour::Black)); 8],
+        [None; 8],
+        [None; 8],
+        [None; 8],
+        [None; 8],
+        [Some(Pice::new(Type::PAWN, Colour::White)); 8],
+        create_first_layer_pice_row(Colour::White),
+    ]
+}
+
+fn create_first_layer_pice_row(colour: Colour) -> [Option<Pice>; 8] {
+    [Some(Pice::new(Type::ROOK, colour)), Some(Pice::new(Type::KNIGHT, colour)), Some(Pice::new(Type::BISHOP, colour)), Some(Pice::new(Type::KING, colour)), Some(Pice::new(Type::QUEEN, colour)), Some(Pice::new(Type::BISHOP, colour)), Some(Pice::new(Type::KNIGHT,colour)), Some(Pice::new(Type::ROOK,colour))]
 }
 
 
@@ -117,34 +148,5 @@ impl fmt::Debug for Game {
         /* build board representation string */
 
         write!(f, "")
-    }
-}
-
-
-
-// --------------------------
-// ######### TESTS ##########
-// --------------------------
-#[cfg(test)]
-mod tests {
-    use super::GameTraits;
-    use super::Game;
-    use super::GameState;
-
-    // check test framework
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-
-    // example test
-    // check that game state is in progress after initialisation
-    #[test]
-    fn game_in_progress_after_init() {
-        let game = Game::new();
-
-        println!("{:?}", game);
-
-        assert_eq!(game.get_game_state(), GameState::InProgress);
     }
 }
