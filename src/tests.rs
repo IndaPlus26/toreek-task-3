@@ -65,7 +65,7 @@ mod tests {
                 let cord2 = get_player_input("Please select a position to move to ");
 
                 if possible_moves.contains(&cord2) {
-                    game.move_piece(position_from_string(&*cord), position_from_string(&*cord2));
+                    game.make_move(&*cord, &*cord2);
                     break;
 
                 }

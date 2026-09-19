@@ -72,8 +72,15 @@ impl GameTraits for Game {
 
     //TODO: GAME STATE AND CHECK FOR ILLEGAL MOVES
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
-        self.move_piece(position_from_string(to), position_from_string(to));
-        
+        let state = InProgress;
+
+
+        self.move_piece(position_from_string(from), position_from_string(to));
+
+        if state == InProgress {
+            self.turn = self.turn.get_opponent_color();
+        }
+
         Option::from(InProgress)
     }
 

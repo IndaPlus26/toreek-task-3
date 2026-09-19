@@ -1,5 +1,6 @@
 use crate::board::position_to_string;
 use crate::Game;
+use crate::piece::Colour::{Black, White};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Piece {
@@ -22,27 +23,28 @@ impl Piece {
 
     //TODO
     pub(crate) fn get_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
-        println!("{:?}", position);
-        let position = (position.0, position.1 + 1);
+        match self.piece_type {
+            _ => self.pawn_possible_moves(position, game),
+        }
+    }
 
-        if is_out_of_bounds(position) {
-            println!("Out of bounds position: ({}, {})", position.0, position.1);
-            vec![]
+    pub(crate) fn pawn_possible_moves(&self, position: (u8, u8), game: &Game) -> Vec<String> {
+        let mut valid_positions: Vec<String> = vec![];
+
+        let color_multiplier: i8 = if game.turn == White {1} else {-1};
+
+        let test_position = (position.0, (position.1 as i8 + color_multiplier) as u8);
+        if is_valid_position((test_position), game) {
+            valid_positions.push(position_to_string(test_position));
         }
-        else if is_friendly_piece_at(position, &game) {
-            println!("Friendly piece: ({}, {})", position.0, position.1);
-            vec![]
-        }
-        else {
-            println!("Sucess");
-            vec![position_to_string(position)]
-        }
+
+        valid_positions
     }
 
 
 
     pub fn get_character_representation(&self) -> char {
-        if self.piece_color.eq(&Colour::Black) {
+        if self.piece_color.eq(&Black) {
             match self.piece_type {
                 Type::KING => '♔',
                 Type::QUEEN => '♕',
@@ -66,6 +68,10 @@ impl Piece {
     }
 }
 
+fn is_valid_position(position: (u8, u8), game: &Game) -> bool {
+    !is_friendly_piece_at(position, &game) && !is_out_of_bounds(position)
+}
+
 fn is_friendly_piece_at(position: (u8, u8), game: &Game) -> bool {
     if let Some(piece) = game.get_piece_at(position) {
         if piece.piece_color == game.turn {
@@ -78,8 +84,20 @@ fn is_friendly_piece_at(position: (u8, u8), game: &Game) -> bool {
     else {
         false
     }
+}
 
-
+fn is_enemy_piece_at(position: (u8, u8), game: &Game) -> bool {
+    if let Some(piece) = game.get_piece_at(position) {
+        if piece.piece_color != game.turn {
+            true
+        }
+        else {
+            false
+        }
+    }
+    else {
+        false
+    }
 }
 
 fn is_out_of_bounds(position: (u8, u8)) -> bool {
@@ -106,4 +124,14 @@ pub enum Colour {
     Black,
 }
 
+impl Colour {
+    pub fn get_opponent_color(&self) -> Colour {
+        if *self == White {
+            Black
+        }
+        else {
+            White
+        }
+    }
 
+}
