@@ -2,9 +2,18 @@
 // Modified by: Isak Larsson
 
 mod tests;
-mod piece;
-mod board;
-mod position;
+
+/// Contains definitions of a chess piece and related code
+pub mod piece;
+
+/// Contains board logic; accessing and moving pieces and initializing the board
+pub mod board;
+
+/// Contains definition of a chess position and position logic
+pub mod position;
+
+/// Contains logic for how each chess piece should move 
+pub mod moves;
 
 use std::fmt;
 use crate::board::*;
@@ -72,12 +81,16 @@ impl GameTraits for Game {
     }
 
 
-    //TODO: GAME STATE AND CHECK FOR ILLEGAL MOVES
+    //TODO: CHECK
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
         let state = InProgress;
 
-
-        self.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
+        if self.get_possible_moves(from).contains(&to.to_string()) {
+            self.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
+        }
+        else {
+            return None;
+        }
 
         if state == InProgress {
             self.turn = self.turn.get_opponent_color();
@@ -118,7 +131,7 @@ impl GameTraits for Game {
 
 
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
-    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KING, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
+    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::King, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
 }
 
 
