@@ -4,11 +4,13 @@
 mod tests;
 mod piece;
 mod board;
+mod position;
 
 use std::fmt;
 use crate::board::*;
 use crate::GameState::InProgress;
 use crate::piece::*;
+use crate::position::{Position};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GameState {
@@ -75,7 +77,7 @@ impl GameTraits for Game {
         let state = InProgress;
 
 
-        self.move_piece(position_from_string(from), position_from_string(to));
+        self.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
 
         if state == InProgress {
             self.turn = self.turn.get_opponent_color();
@@ -98,7 +100,7 @@ impl GameTraits for Game {
     }
 
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
-        let position = position_from_string(position);
+        let position = &Position::from_symbolic_representation(position);
 
         if let Some(piece) = self.get_piece_at(position) && piece.get_piece_color() == self.turn {
             piece.get_possible_moves(position, self)

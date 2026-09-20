@@ -5,7 +5,7 @@
 mod tests {
     use crate::Game;
     use crate::GameState;
-    use crate::board::position_to_string;
+    use crate::position::*;
     use crate::piece::Colour;
     use crate::{GameTraits, create_default_board};
     use std::io;
@@ -110,8 +110,8 @@ mod tests {
 
         for colum in (1..9).rev() {
             for row in 1..9 {
-                if let Some(piece) = game.get_piece_at((row, colum)) {
-                    if possible_moves.contains(&position_to_string((row, colum))) {
+                if let Some(piece) = game.get_piece_at(&Position::new(row, colum)) {
+                    if possible_moves.contains(&Position::new(row, colum).to_symbolic_representation()) {
                         highlight(piece.get_character_representation());
                     }
                     else {
@@ -119,7 +119,7 @@ mod tests {
                     }
                 }
                 else {
-                    if possible_moves.contains(&position_to_string((row, colum))) {
+                    if possible_moves.contains(&Position::new(row, colum).to_symbolic_representation()) {
                         highlight(' ');
                     }
                     else {
