@@ -12,7 +12,7 @@ pub mod board;
 /// Contains definition of a chess position and position logic
 pub mod position;
 
-/// Contains logic for how each chess piece should move 
+/// Contains logic for how each chess piece should move
 pub mod moves;
 
 use std::fmt;
@@ -61,10 +61,6 @@ pub trait GameTraits {
     fn to_fen(&self) -> String;
 }
 
-/*
-    WRITE YOUR IMPLEMENTATION OF "GameTraits" BELOW
-*/
-
 pub struct Game {
     state: GameState,
     turn: Colour,
@@ -81,7 +77,7 @@ impl GameTraits for Game {
     }
 
 
-    //TODO: CHECK
+    /// Checks if the move is legal, see [`self.get_possible_moves`]. If true moves the piece, see [`Game::move_piece`],  else returns [`None`]
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
         let state = InProgress;
 
@@ -92,6 +88,8 @@ impl GameTraits for Game {
             return None;
         }
 
+
+
         if state == InProgress {
             self.turn = self.turn.get_opponent_color();
         }
@@ -99,7 +97,6 @@ impl GameTraits for Game {
         Option::from(InProgress)
     }
 
-    // or this.
     fn make_promotion(&mut self, piece: &str) -> Option<GameState> {
         None
     }
@@ -112,6 +109,12 @@ impl GameTraits for Game {
         self.turn
     }
 
+
+    /// Converts a symbolic representation of a chess position into a [`Position`]. See [`Position::from_symbolic_representation`]
+    ///
+    /// If the [`Position`] contains a [`Piece`] that has the same [`Colour`] as the current turn, check for possible moves. See [`Piece::get_possible_moves`]
+    ///
+    /// Returns a [`Vec<String>`] contain the possible moves. Returns an empty [`Vec<String>`] if no possible moves was found.
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
         let position = &Position::from_symbolic_representation(position);
 
@@ -130,9 +133,6 @@ impl GameTraits for Game {
 
 
 
-fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
-    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::King, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
-}
 
 
 

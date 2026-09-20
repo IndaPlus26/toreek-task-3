@@ -67,7 +67,7 @@ mod tests {
                 if game.make_move(&*cord, &*cord2).is_some() {
                     break;
                 }
-                
+
             }
 
         }
@@ -81,8 +81,6 @@ mod tests {
     fn get_player_input(message: &str) -> String {
         loop {
             println!("{}", message);
-            let input = io::stdin();
-
             let mut input = String::new();
             match io::stdin().read_line(&mut input) {
                 Ok(_n) => {

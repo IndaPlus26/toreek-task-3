@@ -1,4 +1,4 @@
-use crate::{create_first_layer_piece_row, Game};
+use crate::{Game};
 use crate::piece::{Colour, Piece, Type};
 use crate::position::Position;
 
@@ -17,7 +17,6 @@ impl Game {
         self.set_piece_at(new_position, piece);
         self.set_piece_at(original_position, None);
     }
-
 }
 
 pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
@@ -32,4 +31,9 @@ pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
         create_first_layer_piece_row(Colour::Black),
     ]
 }
+
+fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
+    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::King, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
+}
+
 
