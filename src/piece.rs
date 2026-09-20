@@ -26,16 +26,32 @@ impl Piece {
         match self.piece_type {
             Type::KING => todo!(),
             Type::QUEEN => todo!(),
-            Type::ROOK => todo!(),
+            Type::ROOK => self.rook_possible_moves(position, game),
             Type::BISHOP => self.bishop_possible_moves(position, game),
             Type::KNIGHT => self.knight_possible_moves(position, game),
             Type::PAWN => self.pawn_possible_moves(position, game),
         }
     }
 
-    /*
-        BISHOP MOVE LOGIC
-     */
+
+    pub(crate) fn rook_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
+        let mut valid_positions: Vec<String> = vec![];
+
+        for direction_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
+            for step_multiplier in 0..2 {
+                for step in 1..9 {
+
+                    let test_position = &position.add(direction_multiplier * step_multiplier * step , direction_multiplier * (1 - step_multiplier) * step);
+                    if !add_position_if_valid(test_position, game, &mut valid_positions) || test_position.is_enemy_piece_at(game) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        valid_positions
+    }
+
     pub(crate) fn bishop_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
@@ -55,10 +71,6 @@ impl Piece {
     }
 
 
-
-    /*
-        KNIGHT MOVE LOGIC
-    */
     pub(crate) fn knight_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
@@ -75,10 +87,6 @@ impl Piece {
         valid_positions
     }
 
-
-    /*
-       PAWN MOVE LOGIC
-     */
     pub(crate) fn pawn_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
