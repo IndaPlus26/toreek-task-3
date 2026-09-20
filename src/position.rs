@@ -10,6 +10,10 @@ impl Position {
         Position { x, y }
     }
 
+    pub fn eq(&self, other: &Position) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+
     pub fn add(&self, x_offset: i8, y_offset: i8) -> Position {
         Position::new(self.x.wrapping_add(x_offset), self.y.wrapping_add(y_offset))
     }
@@ -80,7 +84,7 @@ pub fn get_number_from_letter(letter: char) -> i8 {
         'F' => 6,
         'G' => 7,
         'H' => 8,
-        _   => 1
+         _  => 1
     }
 }
 

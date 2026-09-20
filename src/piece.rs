@@ -1,5 +1,6 @@
-use crate::Game;
+use crate::{Game, GameTraits};
 use crate::piece::Colour::{Black, White};
+use crate::piece::Type::*;
 use crate::position::Position;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -24,13 +25,65 @@ impl Piece {
     //TODO
     pub(crate) fn get_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         match self.piece_type {
-            Type::KING => todo!(),
-            Type::QUEEN => self.queen_possible_moves(position, game),
-            Type::ROOK => self.rook_possible_moves(position, game, vec![]),
-            Type::BISHOP => self.bishop_possible_moves(position, game, vec![]),
-            Type::KNIGHT => self.knight_possible_moves(position, game),
-            Type::PAWN => self.pawn_possible_moves(position, game),
+            KING => self.king_possible_moves(position, game),
+            QUEEN => self.queen_possible_moves(position, game),
+            ROOK => self.rook_possible_moves(position, game, vec![]),
+            BISHOP => self.bishop_possible_moves(position, game, vec![]),
+            KNIGHT => self.knight_possible_moves(position, game),
+            PAWN => self.pawn_possible_moves(position, game),
         }
+    }
+
+
+    pub(crate) fn king_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
+        let mut moves = self.king_moves(position, game);
+
+        for illegal_move in self.king_illegal_moves(game) {
+            moves.retain(|x| !x.eq(&illegal_move));
+
+        }
+
+        moves
+    }
+    pub(crate) fn king_illegal_moves(&self, game: &Game) -> Vec<String> {
+        let mut illegal_moves: Vec<String> = vec![];
+
+        for x in 1..9 {
+            for y in 1..9 {
+                let test_position = Position::new(x, y);
+
+                if let Some(piece) = game.get_piece_at(&test_position) && piece.get_piece_color().eq(&game.get_turn().get_opponent_color())  {
+
+                    if piece.piece_type.eq(&KING) {
+                        illegal_moves.extend(piece.king_moves(&test_position, game));
+                    }
+                    else if piece.piece_type.eq(&PAWN) {
+                        let color_multiplier: i8 = if game.turn.get_opponent_color() == White {1} else {-1};
+                        add_position_if_valid(&test_position.add(1, color_multiplier), game, &mut illegal_moves);
+                        add_position_if_valid(&test_position.add(-1, color_multiplier), game, &mut illegal_moves);
+                    }
+                    else{
+                        illegal_moves.extend(piece.get_possible_moves(&test_position, game));
+                    }
+                }
+            }
+        }
+
+        illegal_moves
+    }
+
+    pub(crate) fn king_moves(&self, position: &Position, game: &Game) -> Vec<String> {
+        let mut positions: Vec<String> = vec![];
+
+        for x in -1..2 {
+            for y in -1..2 {
+                if x != 0 || y != 0 {
+                    add_position_if_valid(&position.add(x, y), game, &mut positions);
+                }
+            }
+        }
+
+        positions
     }
 
     pub(crate) fn queen_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
@@ -129,23 +182,23 @@ impl Piece {
     pub fn get_character_representation(&self) -> char {
         if self.piece_color.eq(&Black) {
             match self.piece_type {
-                Type::KING => '♔',
-                Type::QUEEN => '♕',
-                Type::ROOK => '♖',
-                Type::BISHOP => '♗',
-                Type::KNIGHT => '♘',
-                Type::PAWN => '♙'
+                KING => '♔',
+                QUEEN => '♕',
+                ROOK => '♖',
+                BISHOP => '♗',
+                KNIGHT => '♘',
+                PAWN => '♙'
             }
         }
 
         else {
             match self.piece_type {
-                Type::KING => '♚',
-                Type::QUEEN => '♛',
-                Type::ROOK => '♜',
-                Type::BISHOP => '♝',
-                Type::KNIGHT => '♞',
-                Type::PAWN => '♟'
+                KING => '♚',
+                QUEEN => '♛',
+                ROOK => '♜',
+                BISHOP => '♝',
+                KNIGHT => '♞',
+                PAWN => '♟'
             }
         }
     }
