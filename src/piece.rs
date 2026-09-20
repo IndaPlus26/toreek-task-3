@@ -24,11 +24,37 @@ impl Piece {
     //TODO
     pub(crate) fn get_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         match self.piece_type {
-            Type::PAWN => self.pawn_possible_moves(position, game),
+            Type::KING => todo!(),
+            Type::QUEEN => todo!(),
+            Type::ROOK => todo!(),
+            Type::BISHOP => self.bishop_possible_moves(position, game),
             Type::KNIGHT => self.knight_possible_moves(position, game),
-            _ => todo!(),
+            Type::PAWN => self.pawn_possible_moves(position, game),
         }
     }
+
+    /*
+        BISHOP MOVE LOGIC
+     */
+    pub(crate) fn bishop_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
+        let mut valid_positions: Vec<String> = vec![];
+
+        for x_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
+            for y_multiplier in (-1..2).step_by(2) {
+                for step in 1..9 {
+
+                    let test_position = &position.add(step * x_multiplier, step * y_multiplier);
+                    if !add_position_if_valid(test_position, game, &mut valid_positions) || test_position.is_enemy_piece_at(game) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        valid_positions
+    }
+
+
 
     /*
         KNIGHT MOVE LOGIC
