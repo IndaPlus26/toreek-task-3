@@ -25,20 +25,21 @@ impl Piece {
     pub(crate) fn get_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         match self.piece_type {
             Type::KING => todo!(),
-            Type::QUEEN => todo!(),
-            Type::ROOK => self.rook_possible_moves(position, game),
-            Type::BISHOP => self.bishop_possible_moves(position, game),
+            Type::QUEEN => self.queen_possible_moves(position, game),
+            Type::ROOK => self.rook_possible_moves(position, game, vec![]),
+            Type::BISHOP => self.bishop_possible_moves(position, game, vec![]),
             Type::KNIGHT => self.knight_possible_moves(position, game),
             Type::PAWN => self.pawn_possible_moves(position, game),
         }
     }
 
+    pub(crate) fn queen_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
+        self.rook_possible_moves(position, game, self.bishop_possible_moves(position, game, vec![]))
+    }
 
-    pub(crate) fn rook_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
-        let mut valid_positions: Vec<String> = vec![];
-
+    pub(crate) fn rook_possible_moves(&self, position: &Position, game: &Game, mut valid_positions: Vec<String>) -> Vec<String> {
         for direction_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
-            for step_multiplier in 0..2 {
+            for step_multiplier in 0..2 { //Loops for 0 and 1
                 for step in 1..9 {
 
                     let test_position = &position.add(direction_multiplier * step_multiplier * step , direction_multiplier * (1 - step_multiplier) * step);
@@ -52,9 +53,7 @@ impl Piece {
         valid_positions
     }
 
-    pub(crate) fn bishop_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
-        let mut valid_positions: Vec<String> = vec![];
-
+    pub(crate) fn bishop_possible_moves(&self, position: &Position, game: &Game, mut valid_positions: Vec<String>) -> Vec<String> {
         for x_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
             for y_multiplier in (-1..2).step_by(2) {
                 for step in 1..9 {
@@ -69,7 +68,6 @@ impl Piece {
 
         valid_positions
     }
-
 
     pub(crate) fn knight_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
