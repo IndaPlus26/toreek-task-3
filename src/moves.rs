@@ -6,7 +6,7 @@ use crate::position::Position;
 /// Contains the logic behind the move pattern for type [`King`]
 /// See [`king_possible_moves`] for entry point
 pub(crate) mod king {
-
+    use crate::piece::Colour;
     use super::*;
 
     /// Entry point for [`King`] move pattern logic
@@ -19,7 +19,7 @@ pub(crate) mod king {
     pub(crate) fn king_possible_moves(position: &Position, game: &Game) -> Vec<String> {
         let mut moves = king_moves(position, game);
 
-        for illegal_move in king_illegal_moves(game) {
+        for illegal_move in king_illegal_moves(game, &game.get_turn().get_opponent_color()) {
             moves.retain(|x| !x.eq(&illegal_move));
         }
 
@@ -35,18 +35,18 @@ pub(crate) mod king {
     /// If the [`Piece`] is a [`King`] check the positions around the king. See [`king_moves`]. We can't reuse [`Piece::get_possible_moves`] as it would refer to this metod, resulting in a loop.
     /// If the [`Piece`] is a [`PAWN`] check the positions diagonally in front of the [`PAWN`].  We can't reuse [`Piece::get_possible_moves`] as the default move pattern doesn't neccessarely threaten other pieces.
     /// If the [`Piece`] is any other piece, get their possible moves from [`Piece::get_possible_moves`]
-    fn king_illegal_moves(game: &Game) -> Vec<String> {
+    pub(crate) fn king_illegal_moves(game: &Game, checked_color: &Colour) -> Vec<String> {
         let mut illegal_moves: Vec<String> = vec![];
 
         for x in 1..9 {
             for y in 1..9 {
                 let test_position = Position::new(x, y);
 
-                if let Some(piece) = game.get_piece_at(&test_position) && piece.get_piece_color().eq(&game.get_turn().get_opponent_color()) {
+                if let Some(piece) = game.get_piece_at(&test_position) && piece.get_piece_color().eq(checked_color) {
                     if piece.get_piece_type().eq(&King) {
                         illegal_moves.extend(king_moves(&test_position, game));
                     } else if piece.get_piece_type().eq(&PAWN) {
-                        let color_multiplier: i8 = if game.turn.get_opponent_color() == White { 1 } else { -1 };
+                        let color_multiplier: i8 = if checked_color.eq(&White) { 1 } else { -1 };
                         add_position_if_valid(&test_position.add(1, color_multiplier), game, &mut illegal_moves);
                         add_position_if_valid(&test_position.add(-1, color_multiplier), game, &mut illegal_moves);
                     } else {
@@ -171,12 +171,11 @@ pub(crate) mod pawn {
         //White pawns can only move up and black pawn can only move down
         let color_multiplier: i8 = if game.turn == White {1} else {-1};
 
-        pawn_move_straight(position, game, color_multiplier, &mut valid_positions);
+        let check = pawn_move_straight(position, game, color_multiplier, &mut valid_positions);
 
         //Check if pawn can be moved two pieces ahead
-        if (game.turn == White && position.y == 2) || (game.turn == Black && position.y == 7) {
+        if  check && ((game.turn == White && position.y == 2) || (game.turn == Black && position.y == 7)) {
             pawn_move_straight(position, game, color_multiplier * 2, &mut valid_positions);
-
         }
 
         pawn_move_side(position, game, 1, color_multiplier, &mut valid_positions);
@@ -187,11 +186,15 @@ pub(crate) mod pawn {
     }
 
     /// Checks if a [`PAWN`] can move straight.
-    fn pawn_move_straight(position: &Position, game: &Game, offset: i8, valid_positions: &mut Vec<String>) {
+    fn pawn_move_straight(position: &Position, game: &Game, offset: i8, valid_positions: &mut Vec<String>) -> bool {
 
         let test_pos = position.add_y(offset);
         if !test_pos.is_enemy_piece_at(game) {
             add_position_if_valid(&test_pos, game, valid_positions);
+            true
+        }
+        else {
+            false
         }
     }
 
