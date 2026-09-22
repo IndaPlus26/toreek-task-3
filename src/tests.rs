@@ -37,7 +37,7 @@ mod tests {
         let mut game = Game::new();
         println!();
 
-        while game.state.eq(&GameState::InProgress) {
+        while game.state.eq(&GameState::InProgress) || game.state.eq(&GameState::Check) {
             print!("Your turn ");
             println!("{}", get_colour_string(game.turn));
 

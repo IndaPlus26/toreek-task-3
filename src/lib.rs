@@ -17,7 +17,7 @@ pub mod moves;
 
 use std::fmt;
 use crate::board::*;
-use crate::GameState::InProgress;
+use crate::GameState::*;
 use crate::piece::*;
 use crate::position::{Position};
 
@@ -61,6 +61,7 @@ pub trait GameTraits {
     fn to_fen(&self) -> String;
 }
 
+#[derive(Copy, Clone)]
 pub struct Game {
     state: GameState,
     turn: Colour,
@@ -79,22 +80,39 @@ impl GameTraits for Game {
 
     /// Checks if the move is legal, see [`self.get_possible_moves`]. If true moves the piece, see [`Game::move_piece`],  else returns [`None`]
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
-        let state = InProgress;
+         let illegal_move = match self.state {
+            InProgress => {
+                handle_in_progress(self, from, to)
+            }
+            Check => {
+                handle_check(self, from, to)
+            }
+            GameOver => {
+                true
+            }
+            Promoting => {
+                true
+            }
+        };
 
-        if self.get_possible_moves(from).contains(&to.to_string()) {
-            self.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
-        }
-        else {
+
+        if illegal_move {
             return None;
         }
 
+        self.state = check_check(self, &self.get_turn());
 
+        if self.state.eq(&Check) {
+            if check_check_mate(self) {
+                self.state = GameOver;
+            }
+        }
 
-        if state == InProgress {
+        if self.get_game_state().eq(&InProgress) || self.get_game_state().eq(&Check) {
             self.turn = self.turn.get_opponent_color();
         }
 
-        Option::from(InProgress)
+        Some(self.state)
     }
 
     fn make_promotion(&mut self, piece: &str) -> Option<GameState> {
@@ -119,7 +137,7 @@ impl GameTraits for Game {
         let position = &Position::from_symbolic_representation(position);
 
         if let Some(piece) = self.get_piece_at(position) && piece.get_piece_color() == self.turn {
-            piece.get_possible_moves(position, self)
+            check_possible_moves_check(position, self, &piece, &self.turn.get_opponent_color())
         }
         else {
             vec![]
