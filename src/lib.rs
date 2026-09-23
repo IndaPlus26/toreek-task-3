@@ -25,8 +25,9 @@ use crate::position::{Position};
 pub enum GameState {
     InProgress,
     Check,
+    Checkmate,
     Promoting,
-    GameOver
+    Stalemate
 }
 
 pub trait GameTraits {
@@ -85,12 +86,9 @@ impl GameTraits for Game {
                 handle_in_progress(self, from, to)
             }
             Check => {
-                handle_check(self, from, to)
+                handle_in_progress(self, from, to)
             }
-            GameOver => {
-                true
-            }
-            Promoting => {
+            _ => {
                 true
             }
         };
@@ -100,12 +98,18 @@ impl GameTraits for Game {
             return None;
         }
 
-        self.state = check_check(self, &self.get_turn());
+        self.state = check_check(self);
 
-        if self.state.eq(&Check) {
-            if check_check_mate(self) {
-                self.state = GameOver;
+        if has_opponent_possible_moves(self) {
+            if self.state.eq(&Check) {
+                self.state = Checkmate;
+                println!("Checkmate",);
             }
+            else {
+                self.state = Stalemate;
+                println!("Stalemate",);
+            }
+
         }
 
         if self.get_game_state().eq(&InProgress) || self.get_game_state().eq(&Check) {
@@ -137,7 +141,7 @@ impl GameTraits for Game {
         let position = &Position::from_symbolic_representation(position);
 
         if let Some(piece) = self.get_piece_at(position) && piece.get_piece_color() == self.turn {
-            check_possible_moves_check(position, self, &piece, &self.turn.get_opponent_color())
+            check_possible_moves_check(position, self, &piece)
         }
         else {
             vec![]
