@@ -30,6 +30,14 @@ mod tests {
         assert_eq!(game.board, create_default_board());
     }
 
+    #[test]
+    fn test_fen() {
+        let game = Game::new();
+
+        assert_eq!(game.to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");
+    }
+
+
 
     //Test game loop
     #[test]

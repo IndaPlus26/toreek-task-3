@@ -1,6 +1,6 @@
 use crate::GameState::{Check, Checkmate, InProgress, Stalemate};
 use crate::piece::Colour::{Black, White};
-use crate::piece::Type::{King, PAWN};
+use crate::piece::Type::{King, PAWN, QUEEN};
 use crate::piece::{Colour, Piece, Type};
 use crate::position::Position;
 use crate::{Game, GameTraits, moves};
@@ -14,7 +14,18 @@ impl Game {
         self.board[(position.y - 1) as usize][(position.x - 1) as usize] = piece;
     }
 
+    /// Moves a piece without restrictions. Also resets or increment the [`Game.halfmove_clock`]
     pub(crate) fn move_piece(&mut self, original_position: &Position, new_position: &Position) {
+        if self.get_piece_at(original_position).unwrap().get_piece_type().eq(&PAWN) {
+            self.halfmove_clock = 0;
+        }
+        else if self.get_piece_at(new_position).is_some() {
+            self.halfmove_clock = 0;
+        }
+        else {
+            self.halfmove_clock += 1;
+        }
+
         let piece = self.get_piece_at(original_position);
 
         self.set_piece_at(new_position, piece);
@@ -36,7 +47,7 @@ pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
 }
 
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
-    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
+    [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(QUEEN, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
 }
 
 /// Checks if the opponent is in [`Check`]. See [`check_for_check`]
@@ -46,6 +57,7 @@ fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
 /// If the opponent isn't in [`Check`] and does not have any legal moves. Set [`game.state`] to [`Stalemate`]
 ///
 /// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`]
+/// Also increment the [`Game::fullmove_clock`] if applicable
 pub(crate) fn post_turn_check(game: &mut Game) {
     game.state = if check_for_check(game) {Check} else {InProgress};
     if has_opponent_possible_moves(game) {
@@ -58,7 +70,15 @@ pub(crate) fn post_turn_check(game: &mut Game) {
 
     }
 
+    if game.halfmove_clock >= 50 {
+        game.state = Stalemate;
+    }
+
     if game.get_game_state().eq(&InProgress) || game.get_game_state().eq(&Check) {
+        if game.get_turn().eq(&Black) {
+            game.fullmove_counter += 1;
+        }
+
         game.turn = game.turn.get_opponent_color();
     }
 }

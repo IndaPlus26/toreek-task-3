@@ -64,7 +64,25 @@ impl Piece {
             }
         }
     }
+
+    pub fn get_fen_representation(&self) -> char {
+        let mut representation = match self.piece_type {
+            King => 'k',
+            QUEEN => 'q',
+            ROOK => 'r',
+            BISHOP => 'b',
+            KNIGHT => 'n',
+            PAWN => 'p'
+        };
+
+        if self.piece_color.eq(&White) {
+            representation = representation.to_ascii_uppercase()
+        }
+
+        representation
+    }
 }
+
 
 
 

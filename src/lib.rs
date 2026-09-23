@@ -19,6 +19,7 @@ use std::fmt;
 use crate::board::*;
 use crate::GameState::*;
 use crate::piece::*;
+use crate::piece::Colour::White;
 use crate::position::{Position};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -66,26 +67,30 @@ pub trait GameTraits {
 pub struct Game {
     state: GameState,
     turn: Colour,
-    board: [[Option<Piece>; 8]; 8]
+    board: [[Option<Piece>; 8]; 8],
+    halfmove_clock: u8,
+    fullmove_counter: u32,
 }
 
 impl GameTraits for Game {
     fn new() -> Game {
         Game {
             state: InProgress,
-            turn: Colour::White,
-            board: create_default_board()
+            turn: White,
+            board: create_default_board(),
+            halfmove_clock: 0,
+            fullmove_counter: 1
         }
     }
 
-    
+
     /// Entry point for moving a piece
     /// Checks if the [`GameState`] allows for moves to be made. Moves are only allowed during [`Check`] and [`InProgress`]
-    /// 
+    ///
     /// See [`handle_in_progress`] for piece movement logic
-    /// 
+    ///
     /// Returns [`None`] if the move was illegal or movement wasn't allowed
-    /// 
+    ///
     /// Calls [`post_turn_check`] to determinate the next [`GameState`]
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
          let illegal_move = match self.state {
@@ -99,7 +104,6 @@ impl GameTraits for Game {
                 true
             }
         };
-
 
         if illegal_move {
             return None;
@@ -139,13 +143,45 @@ impl GameTraits for Game {
     }
 
     fn to_fen(&self) -> String {
-        todo!()
+        let mut fen = String::new();
+
+        for y in (1..9).rev() {
+
+            let mut counter = 0;
+            for x in 1..9 {
+                if let Some(piece) = self.get_piece_at(&Position::new(x, y)) {
+
+                    if counter != 0 {
+                        fen.push_str(&*counter.to_string());
+                        counter = 0;
+                    }
+
+                    fen.push(piece.get_fen_representation())
+                }
+                else {
+                    counter += 1
+                }
+            }
+
+            if counter != 0 {
+                fen.push_str(&*counter.to_string());
+            }
+
+            if y != 1 {
+                fen.push('/');
+            }
+        }
+
+        fen.push(' ');
+        fen.push(if self.get_turn().eq(&White) {'w'} else {'b'});
+        fen.push_str(" - - ");
+        fen.push_str(&self.halfmove_clock.to_string());
+        fen.push(' ');
+        fen.push_str(&self.fullmove_counter.to_string());
+
+        fen
     }
 }
-
-
-
-
 
 
 /// Implement print routine for Game.
