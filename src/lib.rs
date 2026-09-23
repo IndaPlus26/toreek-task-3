@@ -78,8 +78,15 @@ impl GameTraits for Game {
         }
     }
 
-
-    /// Checks if the move is legal, see [`self.get_possible_moves`]. If true moves the piece, see [`Game::move_piece`],  else returns [`None`]
+    
+    /// Entry point for moving a piece
+    /// Checks if the [`GameState`] allows for moves to be made. Moves are only allowed during [`Check`] and [`InProgress`]
+    /// 
+    /// See [`handle_in_progress`] for piece movement logic
+    /// 
+    /// Returns [`None`] if the move was illegal or movement wasn't allowed
+    /// 
+    /// Calls [`post_turn_check`] to determinate the next [`GameState`]
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
          let illegal_move = match self.state {
             InProgress => {
@@ -98,24 +105,7 @@ impl GameTraits for Game {
             return None;
         }
 
-        self.state = check_check(self);
-
-        if has_opponent_possible_moves(self) {
-            if self.state.eq(&Check) {
-                self.state = Checkmate;
-                println!("Checkmate",);
-            }
-            else {
-                self.state = Stalemate;
-                println!("Stalemate",);
-            }
-
-        }
-
-        if self.get_game_state().eq(&InProgress) || self.get_game_state().eq(&Check) {
-            self.turn = self.turn.get_opponent_color();
-        }
-
+        post_turn_check(self);
         Some(self.state)
     }
 
@@ -134,14 +124,14 @@ impl GameTraits for Game {
 
     /// Converts a symbolic representation of a chess position into a [`Position`]. See [`Position::from_symbolic_representation`]
     ///
-    /// If the [`Position`] contains a [`Piece`] that has the same [`Colour`] as the current turn, check for possible moves. See [`Piece::get_possible_moves`]
+    /// If the [`Position`] contains a [`Piece`] that has the same [`Colour`] as the current turn, check for possible moves. See [`check_possible_moves`]
     ///
     /// Returns a [`Vec<String>`] contain the possible moves. Returns an empty [`Vec<String>`] if no possible moves was found.
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
         let position = &Position::from_symbolic_representation(position);
 
         if let Some(piece) = self.get_piece_at(position) && piece.get_piece_color() == self.turn {
-            check_possible_moves_check(position, self, &piece)
+            check_possible_moves(position, self, &piece)
         }
         else {
             vec![]

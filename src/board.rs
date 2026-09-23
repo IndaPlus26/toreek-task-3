@@ -1,8 +1,9 @@
+use crate::GameState::{Check, Checkmate, InProgress, Stalemate};
 use crate::piece::Colour::{Black, White};
 use crate::piece::Type::{King, PAWN};
 use crate::piece::{Colour, Piece, Type};
 use crate::position::Position;
-use crate::{Game, GameState, GameTraits, moves};
+use crate::{Game, GameTraits, moves};
 
 impl Game {
     pub(crate) fn get_piece_at(&self, position: &Position) -> Option<Piece> {
@@ -38,17 +39,35 @@ fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
     [Some(Piece::new(Type::ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::QUEEN, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
 }
 
-pub(crate) fn handle_in_progress(game: &mut Game, from: &str, to: &str) -> bool {
-    if game.get_possible_moves(from).contains(&to.to_string()) {
-        game.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
-        false
+/// Checks if the opponent is in [`Check`]. See [`check_for_check`]
+/// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`]
+///
+/// If the opponent is in [`Check`] and does not have any legal moves. Set [`game.state`] to [`Checkmate`]
+/// If the opponent isn't in [`Check`] and does not have any legal moves. Set [`game.state`] to [`Stalemate`]
+///
+/// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`]
+pub(crate) fn post_turn_check(game: &mut Game) {
+    game.state = if check_for_check(game) {Check} else {InProgress};
+    if has_opponent_possible_moves(game) {
+        if game.state.eq(&Check) {
+            game.state = Checkmate;
+        }
+        else {
+            game.state = Stalemate;
+        }
+
     }
-    else {
-        true
+
+    if game.get_game_state().eq(&InProgress) || game.get_game_state().eq(&Check) {
+        game.turn = game.turn.get_opponent_color();
     }
 }
 
-pub(crate) fn check_check(game: &Game) -> GameState {
+/// Checks if the opponent is in [`Check`]
+/// See [`moves::king::king_illegal_moves`]
+///
+/// Returns true if the opponent [`King`] is in check
+pub(crate) fn check_for_check(game: &Game) -> bool {
     let mut king_piece_pos: String = "".to_string();
 
     'outer: for x in 1..9 {
@@ -61,23 +80,36 @@ pub(crate) fn check_check(game: &Game) -> GameState {
         }
     }
 
-    if !moves::king::king_illegal_moves(&game, &game.get_turn()).contains(&king_piece_pos) {
-         GameState::InProgress
+    if moves::king::king_illegal_moves(&game, &game.get_turn()).contains(&king_piece_pos) {
+        true
     }
     else {
-        GameState::Check
+        false
+    }
+}
+
+/// Checks if the move is legal, see [`Game::get_possible_moves`]. If true moves the piece, see [`Game::move_piece`] and returns true, else returns false
+pub(crate) fn handle_in_progress(game: &mut Game, from: &str, to: &str) -> bool {
+    if game.get_possible_moves(from).contains(&to.to_string()) {
+        game.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
+        false
+    }
+    else {
+        true
     }
 }
 
 
-/// Checks if the opponent can do any moves
+
+/// Recursively goes through every possible move for every [`Piece`] on the board for the opposite player
+/// Checks if the opponent can do any legal moves. Used to determinate [`Checkmate`] or [`Stalemate`]
 pub(crate) fn has_opponent_possible_moves(game: &mut Game) -> bool {
     game.turn = game.get_turn().get_opponent_color();
 
     for x in 1..9 {
         for y in 1..9 {
             if let Some(piece) = game.get_piece_at(&Position::new(x, y)) && piece.get_piece_color().eq(&game.get_turn()) {
-                if !check_possible_moves_check(&Position::new(x, y), &game, &piece).is_empty() {
+                if !check_possible_moves(&Position::new(x, y), &game, &piece).is_empty() {
                     return false
                 }
             }
@@ -88,7 +120,14 @@ pub(crate) fn has_opponent_possible_moves(game: &mut Game) -> bool {
     true
 }
 
-pub(crate) fn check_possible_moves_check(position: &Position, game: &Game, piece: &Piece) -> Vec<String> {
+/// Checks if a [`Piece`] has any legal moves on a specific [`Position`]
+///
+/// Gets all moves a [`Piece`] can do, see [`Piece::get_possible_moves`] for per [`Type`] logic
+///
+/// Checks if any moves puts the own [`King`] into check. See [`check_for_check`]
+/// Moves that puts the own [`King`] into check are considered illegal and are not added to the final [`Vec<String>`] of allowed_moves
+/// Returns a [`Vec<String>`] of all legal moves a [`Piece`] can do
+pub(crate) fn check_possible_moves(position: &Position, game: &Game, piece: &Piece) -> Vec<String> {
     let mut allowed_moves: Vec<String> = vec![];
 
     for moves in piece.get_possible_moves(position, game) {
@@ -98,7 +137,7 @@ pub(crate) fn check_possible_moves_check(position: &Position, game: &Game, piece
         game_test.turn = game.get_turn().get_opponent_color();
         game_test.move_piece(position, &Position::from_symbolic_representation(&*moves));
 
-        if check_check(&game_test).eq(&GameState::InProgress) {
+        if !check_for_check(&game_test) {
 
             if !allowed_moves.contains(&moves) {
                allowed_moves.push(moves);
