@@ -78,7 +78,7 @@ pub(crate) fn post_turn_check(game: &mut Game) {
 
     }
 
-    if game.halfmove_clock >= 50 {
+    if game.halfmove_clock >= 100 {
         game.state = Stalemate;
     }
 
