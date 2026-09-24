@@ -113,8 +113,30 @@ impl GameTraits for Game {
         Some(self.state)
     }
 
+    /// Entry point for making a promotion
+    /// Checks if the [`GameState`] allows for/equals [`Promoting`]
+    /// Checks if the input is valid. See [`get_promotion_type`]
+    ///
+    /// If the input is valid, promote the piece and do the usual [`post_turn_check`]
     fn make_promotion(&mut self, piece: &str) -> Option<GameState> {
-        None
+        if self.state.eq(&Promoting)  {
+           if let Some(piece_type) = get_promotion_type(piece) {
+               let position = check_for_promotion(self).unwrap();
+               self. set_piece_at(&position, Some(Piece::new(piece_type, self.get_turn().clone())));
+
+               post_turn_check(self);
+               Some(self.state)
+
+           }
+           else {
+               None
+           }
+
+        }
+        else {
+            None
+        }
+
     }
 
     fn get_game_state(&self) -> GameState {
@@ -142,6 +164,7 @@ impl GameTraits for Game {
         }
     }
 
+    /// Converts the game into a fen string
     fn to_fen(&self) -> String {
         let mut fen = String::new();
 
