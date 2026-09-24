@@ -103,7 +103,9 @@ impl Position {
     }
 }
 
-pub fn get_number_from_letter(letter: char) -> i8 {
+pub fn get_number_from_letter(mut letter: char) -> i8 {
+    letter = letter.to_ascii_uppercase();
+
     match letter {
         'A' => 1,
         'B' => 2,
