@@ -180,8 +180,7 @@ pub(crate) mod pawn {
 
         pawn_move_side(position, game, 1, color_multiplier, &mut valid_positions);
         pawn_move_side(position, game, -1, color_multiplier, &mut valid_positions);
-
-
+        
         valid_positions
     }
 
@@ -198,11 +197,14 @@ pub(crate) mod pawn {
         }
     }
 
-    /// Checks if a [`PAWN`] can move diagonally.
+    /// Checks if a [`PAWN`] can move diagonally. Also checks for en passant
     fn pawn_move_side(position: &Position, game: &Game, offset_x: i8, offset_y: i8, valid_positions: &mut Vec<String>) {
 
         let test_pos = position.add(offset_x, offset_y);
         if test_pos.is_enemy_piece_at(game) {
+            add_position_if_valid(&test_pos, game, valid_positions);
+        }
+        else if let Some(position) = game.en_passant_position && position.eq(&test_pos) {
             add_position_if_valid(&test_pos, game, valid_positions);
         }
     }

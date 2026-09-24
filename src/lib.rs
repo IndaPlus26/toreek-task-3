@@ -70,6 +70,7 @@ pub struct Game {
     board: [[Option<Piece>; 8]; 8],
     halfmove_clock: u8,
     fullmove_counter: u32,
+    en_passant_position: Option<Position>
 }
 
 impl GameTraits for Game {
@@ -79,7 +80,9 @@ impl GameTraits for Game {
             turn: White,
             board: create_default_board(),
             halfmove_clock: 0,
-            fullmove_counter: 1
+            fullmove_counter: 1,
+
+            en_passant_position: None
         }
     }
 
@@ -195,10 +198,25 @@ impl GameTraits for Game {
             }
         }
 
+        //Turn
         fen.push(' ');
         fen.push(if self.get_turn().eq(&White) {'w'} else {'b'});
-        fen.push_str(" - - ");
+
+        //Castling/unimplemented
+        fen.push_str(" -");
+
+        //En passant
+        fen.push(' ');
+        if let Some(position) = &self.en_passant_position {
+            fen.push_str(&*position.to_symbolic_representation());
+        }
+        else {
+            fen.push('-');
+        }
+
+        fen.push(' ');
         fen.push_str(&self.halfmove_clock.to_string());
+
         fen.push(' ');
         fen.push_str(&self.fullmove_counter.to_string());
 

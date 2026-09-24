@@ -145,11 +145,35 @@ pub(crate) fn check_for_check(game: &Game) -> bool {
 /// Checks if the move is legal, see [`Game::get_possible_moves`]. If true moves the piece, see [`Game::move_piece`] and returns true, else returns false
 pub(crate) fn handle_in_progress(game: &mut Game, from: &str, to: &str) -> bool {
     if game.get_possible_moves(from).contains(&to.to_string()) {
-        game.move_piece(&Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
+        let from = Position::from_symbolic_representation(from);
+        let to = Position::from_symbolic_representation(to);
+
+        handle_en_passant(game, &from, &to);
+        game.move_piece(&from, &to);
+
         false
     }
     else {
         true
+    }
+}
+
+/// Checks if a move is an en passant, or allows for an en passant next turn.
+pub(crate) fn handle_en_passant(game: &mut Game, from: &Position, to: &Position) {
+    if let Some(piece) = game.get_piece_at(from) && piece.get_piece_type().eq(&PAWN) {
+
+        //En passant check
+        let color_offset: i8 = if game.get_turn().eq(&White) { -1 } else { 1 };
+        if let Some(position) = game.en_passant_position && to.eq(&position) {
+            game.set_piece_at(&position.add_y(color_offset), None);
+            game.en_passant_position = None;
+        }
+        else if (from.y - to.y).abs() == 2 { //Checks if a pawn has moved two steps
+            game.en_passant_position = Some(to.add_y(color_offset));
+        }
+    }
+    else {
+        game.en_passant_position = None;
     }
 }
 

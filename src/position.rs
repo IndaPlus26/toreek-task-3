@@ -1,7 +1,7 @@
 use crate::Game;
 
 /// A struct that represents a two-dimensional position on a plane.
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Position {
     pub x: i8,
     pub y: i8
