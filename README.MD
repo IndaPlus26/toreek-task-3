@@ -24,4 +24,5 @@ cargo test -- --nocapture --test-threads=1
 - Castling and en passant remain unimplemented
 
 ## Docs
+To access documentation, open file at doc/toreek-task-3/index.html
 
