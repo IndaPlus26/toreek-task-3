@@ -1,6 +1,6 @@
 use crate::GameState::{Check, Checkmate, InProgress, Promoting, Stalemate};
 use crate::piece::Colour::{Black, White};
-use crate::piece::Type::{King, BISHOP, PAWN, QUEEN, ROOK, KNIGHT};
+use crate::piece::Type::{King, Bishop, Pawn, Queen, Rook, Knight};
 use crate::piece::{Colour, Piece, Type};
 use crate::position::Position;
 use crate::{Game, GameTraits, moves};
@@ -16,7 +16,7 @@ impl Game {
 
     /// Moves a piece without restrictions. Also resets or increment the [`Game.halfmove_clock`]
     pub(crate) fn move_piece(&mut self, original_position: &Position, new_position: &Position) {
-        if self.get_piece_at(original_position).unwrap().get_piece_type().eq(&PAWN) {
+        if self.get_piece_at(original_position).unwrap().get_piece_type().eq(&Pawn) {
             self.halfmove_clock = 0;
         }
         else if self.get_piece_at(new_position).is_some() {
@@ -36,22 +36,22 @@ impl Game {
 pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
     [
         create_first_layer_piece_row(White),
-        [Some(Piece::new(PAWN, White)); 8],
+        [Some(Piece::new(Pawn, White)); 8],
         [None; 8],
         [None; 8],
         [None; 8],
         [None; 8],
-        [Some(Piece::new(PAWN, Black)); 8],
+        [Some(Piece::new(Pawn, Black)); 8],
         create_first_layer_piece_row(Black),
     ]
 }
 
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
-    [Some(Piece::new(ROOK, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(QUEEN, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::BISHOP, colour)), Some(Piece::new(Type::KNIGHT, colour)), Some(Piece::new(Type::ROOK, colour))]
+    [Some(Piece::new(Rook, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Queen, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Rook, colour))]
 }
 /// Checks various thing right after a turn
 ///
-/// Checks if any [`PAWN`] can promote. See [`check_for_promotion`]
+/// Checks if any [`Pawn`] can promote. See [`check_for_promotion`]
 ///
 /// Checks if the opponent is in [`Check`]. See [`check_for_check`]
 /// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`]
@@ -92,12 +92,12 @@ pub(crate) fn post_turn_check(game: &mut Game) {
 }
 
 
-/// Checks the board for a [`PAWN`] than can promote
+/// Checks the board for a [`Pawn`] than can promote
 pub(crate) fn check_for_promotion(game: &Game) -> Option<Position> {
     let side = if game.get_turn().eq(&White) {8} else {1};
 
     for x in 1..9 {
-        if let Some(piece) = game.get_piece_at(&Position::new(x, side)) && piece.get_piece_type().eq(&PAWN) {
+        if let Some(piece) = game.get_piece_at(&Position::new(x, side)) && piece.get_piece_type().eq(&Pawn) {
             return Some(Position::new(x, side));
         }
     }
@@ -107,10 +107,10 @@ pub(crate) fn check_for_promotion(game: &Game) -> Option<Position> {
 /// Gets the piece [`Type`] from a String. Returns [`None`] if the str does not contain a valid promotion type.
 pub(crate) fn get_promotion_type(piece: &str) -> Option<Type> {
     match piece.to_lowercase().as_str() {
-        "q" => Some(QUEEN),
-        "r" => Some(ROOK),
-        "b" => Some(BISHOP),
-        "n" => Some(KNIGHT),
+        "q" => Some(Queen),
+        "r" => Some(Rook),
+        "b" => Some(Bishop),
+        "n" => Some(Knight),
 
         _ => None,
     }
@@ -168,7 +168,7 @@ pub(crate) fn handle_move(game: &mut Game, from: &Position, to: &Position) {
 
 /// Checks if a move is an en passant, or allows for an en passant next turn.
 pub(crate) fn handle_en_passant(game: &mut Game, from: &Position, to: &Position) {
-    if let Some(piece) = game.get_piece_at(from) && piece.get_piece_type().eq(&PAWN) {
+    if let Some(piece) = game.get_piece_at(from) && piece.get_piece_type().eq(&Pawn) {
 
         //En passant check
         let color_offset: i8 = if game.get_turn().eq(&White) { -1 } else { 1 };
@@ -201,10 +201,10 @@ pub(crate) fn handle_castling(game: &mut Game, from: &Position, to: &Position) -
         king_check = true;
     }
 
-    if let Some(from_rook) = game.get_piece_at(from) && from_rook.get_piece_type().eq(&ROOK) && from_rook.get_piece_color().eq(&game.get_turn()) {
+    if let Some(from_rook) = game.get_piece_at(from) && from_rook.get_piece_type().eq(&Rook) && from_rook.get_piece_color().eq(&game.get_turn()) {
         rook_position = Some(*from);
     }
-    else if let Some(to_rook) = game.get_piece_at(to) && to_rook.get_piece_type().eq(&ROOK) && to_rook.get_piece_color().eq(&game.get_turn()) {
+    else if let Some(to_rook) = game.get_piece_at(to) && to_rook.get_piece_type().eq(&Rook) && to_rook.get_piece_color().eq(&game.get_turn()) {
         rook_position = Some(*to);
     }
 
@@ -248,10 +248,10 @@ pub(crate) fn handle_castling(game: &mut Game, from: &Position, to: &Position) -
     }
 }
 
-/// Checks if castling still is allowed. Checks if a [`ROOK`] has moved, and from what [`Position`], and if a king has moved and from what [`Position`]
+/// Checks if castling still is allowed. Checks if a [`Rook`] has moved, and from what [`Position`], and if a king has moved and from what [`Position`]
 pub(crate) fn check_castling(game: &mut Game, from: &Position) {
     if let Some(piece) = game.get_piece_at(from) {
-        if piece.get_piece_type().eq(&ROOK) {
+        if piece.get_piece_type().eq(&Rook) {
             if from.eq(&Position::new(1, 1)) {
                 game.castling_queen_white = false;
             } else if from.eq(&Position::new(8, 1)) {

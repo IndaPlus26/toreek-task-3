@@ -5,7 +5,7 @@ use crate::piece::Type::*;
 use crate::position::Position;
 
 /// A struct containing a representation of a chess piece
-/// Holds a [`Type`] e.g. [`KNIGHT`]
+/// Holds a [`Type`] e.g. [`Knight`]
 /// Holds a [`Colour`] e.g. [`White`]
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Piece {
@@ -31,11 +31,11 @@ impl Piece {
     pub(crate) fn get_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         match self.piece_type {
             King => moves::king::king_possible_moves(position, game),
-            QUEEN => moves::queen::queen_possible_moves(position, game),
-            ROOK => moves::rook::rook_possible_moves(position, game, vec![]),
-            BISHOP =>moves::bishop::bishop_possible_moves(position, game, vec![]),
-            KNIGHT => moves::knight::knight_possible_moves(position, game),
-            PAWN => moves::pawn::pawn_possible_moves(position, game),
+            Queen => moves::queen::queen_possible_moves(position, game),
+            Rook => moves::rook::rook_possible_moves(position, game, vec![]),
+            Bishop =>moves::bishop::bishop_possible_moves(position, game, vec![]),
+            Knight => moves::knight::knight_possible_moves(position, game),
+            Pawn => moves::pawn::pawn_possible_moves(position, game),
         }
     }
 
@@ -45,22 +45,22 @@ impl Piece {
         if self.piece_color.eq(&Black) {
             match self.piece_type {
                 King => '♔',
-                QUEEN => '♕',
-                ROOK => '♖',
-                BISHOP => '♗',
-                KNIGHT => '♘',
-                PAWN => '♙'
+                Queen => '♕',
+                Rook => '♖',
+                Bishop => '♗',
+                Knight => '♘',
+                Pawn => '♙'
             }
         }
 
         else {
             match self.piece_type {
                 King => '♚',
-                QUEEN => '♛',
-                ROOK => '♜',
-                BISHOP => '♝',
-                KNIGHT => '♞',
-                PAWN => '♟'
+                Queen => '♛',
+                Rook => '♜',
+                Bishop => '♝',
+                Knight => '♞',
+                Pawn => '♟'
             }
         }
     }
@@ -68,11 +68,11 @@ impl Piece {
     pub fn get_fen_representation(&self) -> char {
         let mut representation = match self.piece_type {
             King => 'k',
-            QUEEN => 'q',
-            ROOK => 'r',
-            BISHOP => 'b',
-            KNIGHT => 'n',
-            PAWN => 'p'
+            Queen => 'q',
+            Rook => 'r',
+            Bishop => 'b',
+            Knight => 'n',
+            Pawn => 'p'
         };
 
         if self.piece_color.eq(&White) {
@@ -89,11 +89,11 @@ impl Piece {
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Type {
     King,
-    QUEEN,
-    ROOK,
-    BISHOP,
-    KNIGHT,
-    PAWN
+    Queen,
+    Rook,
+    Bishop,
+    Knight,
+    Pawn
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]

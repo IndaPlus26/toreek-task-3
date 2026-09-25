@@ -20,12 +20,12 @@ pub(crate) mod king {
     }
 
     /// Returns a [`Vec<String>`] of every possible move the opposite player can do, that can threaten another piece.
-    /// Observe that a [`PAWN`], unlike other [`Piece`]s can move forwards, but can only threaten pieces diagonally
+    /// Observe that a [`Pawn`], unlike other [`Piece`]s can move forwards, but can only threaten pieces diagonally
     ///
     /// Loops every [`Position`] of [`crate::Game::board`]
     /// Checks for [`Piece`] of opposite [`Colour`]
     ///
-    /// If the [`Piece`] is a [`PAWN`] check the positions diagonally in front of the [`PAWN`].  We can't reuse [`Piece::get_possible_moves`] as the default move pattern doesn't neccessarely threaten other pieces.
+    /// If the [`Piece`] is a [`Pawn`] check the positions diagonally in front of the [`Pawn`].  We can't reuse [`Piece::get_possible_moves`] as the default move pattern doesn't neccessarely threaten other pieces.
     /// If the [`Piece`] is any other piece, get their possible moves from [`Piece::get_possible_moves`]
     pub(crate) fn king_illegal_moves(game: &Game, checked_color: &Colour) -> Vec<String> {
         let mut illegal_moves: Vec<String> = vec![];
@@ -37,7 +37,7 @@ pub(crate) mod king {
                 if let Some(piece) = game.get_piece_at(&test_position) && piece.get_piece_color().eq(checked_color) {
                     if piece.get_piece_type().eq(&King) {
                         illegal_moves.extend(king_moves(&test_position, game));
-                    } else if piece.get_piece_type().eq(&PAWN) {
+                    } else if piece.get_piece_type().eq(&Pawn) {
                         let color_multiplier: i8 = if checked_color.eq(&White) { 1 } else { -1 };
                         add_position_if_valid(&test_position.add(1, color_multiplier), game, &mut illegal_moves);
                         add_position_if_valid(&test_position.add(-1, color_multiplier), game, &mut illegal_moves);
@@ -98,12 +98,12 @@ pub(crate) mod king {
 pub(crate) mod queen {
     use super::*;
 
-    /// Entry point for [`QUEEN`] move pattern logic
+    /// Entry point for [`Queen`] move pattern logic
     ///
-    /// The [`QUEEN`] can both move according to the move pattern logic of [`ROOK`] and [`BISHOP`]
+    /// The [`Queen`] can both move according to the move pattern logic of [`Rook`] and [`Bishop`]
     /// See [`rook::rook_possible_moves`] and [`bishop::bishop_possible_moves`]
     ///
-    /// Returns a [`Vec<String>`] of the possible moves for type [`QUEEN`]
+    /// Returns a [`Vec<String>`] of the possible moves for type [`Queen`]
     pub(crate) fn queen_possible_moves(position: &Position, game: &Game) -> Vec<String> {
         rook::rook_possible_moves(position, game, bishop::bishop_possible_moves(position, game, vec![]))
     }
@@ -112,9 +112,9 @@ pub(crate) mod queen {
 pub(crate) mod rook {
     use super::*;
 
-    /// Entry point for [`ROOK`] move pattern logic
+    /// Entry point for [`Rook`] move pattern logic
     ///
-    /// Returns a [`Vec<String>`] of the possible moves for type [`ROOK`]
+    /// Returns a [`Vec<String>`] of the possible moves for type [`Rook`]
     pub(crate) fn rook_possible_moves(position: &Position, game: &Game, mut valid_positions: Vec<String>) -> Vec<String> {
         for direction_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
             for step_multiplier in 0..2 { //Loops for 0 and 1
@@ -161,9 +161,9 @@ pub(crate) mod rook {
 pub(crate) mod bishop {
     use super::*;
 
-    /// Entry point for [`BISHOP`] move pattern logic
+    /// Entry point for [`Bishop`] move pattern logic
     ///
-    /// Returns a [`Vec<String>`] of the possible moves for type [`BISHOP`]
+    /// Returns a [`Vec<String>`] of the possible moves for type [`Bishop`]
     pub(crate) fn bishop_possible_moves(position: &Position, game: &Game, mut valid_positions: Vec<String>) -> Vec<String> {
         for x_multiplier in (-1..2).step_by(2) { //Loops for -1 and 1
             for y_multiplier in (-1..2).step_by(2) {
@@ -182,9 +182,9 @@ pub(crate) mod bishop {
 pub(crate) mod knight {
     use super::*;
 
-    /// Entry point for [`KNIGHT`] move pattern logic
+    /// Entry point for [`Knight`] move pattern logic
     ///
-    /// Returns a [`Vec<String>`] of the possible moves for type [`KNIGHT`]
+    /// Returns a [`Vec<String>`] of the possible moves for type [`Knight`]
     pub(crate) fn knight_possible_moves(position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
@@ -205,11 +205,11 @@ pub(crate) mod knight {
 pub(crate) mod pawn {
     use super::*;
 
-    /// Entry point for [`PAWN`] move pattern logic
+    /// Entry point for [`Pawn`] move pattern logic
     ///
-    /// The [`PAWN`] can only move towards the other player. The `color_multiplier` variable is used for this purpose.
+    /// The [`Pawn`] can only move towards the other player. The `color_multiplier` variable is used for this purpose.
     ///
-    /// Returns a [`Vec<String>`] of the possible moves for type [`PAWN`]
+    /// Returns a [`Vec<String>`] of the possible moves for type [`Pawn`]
     pub(crate) fn pawn_possible_moves(position: &Position, game: &Game) -> Vec<String> {
         let mut valid_positions: Vec<String> = vec![];
 
@@ -229,7 +229,7 @@ pub(crate) mod pawn {
         valid_positions
     }
 
-    /// Checks if a [`PAWN`] can move straight.
+    /// Checks if a [`Pawn`] can move straight.
     fn pawn_move_straight(position: &Position, game: &Game, offset: i8, valid_positions: &mut Vec<String>) -> bool {
 
         let test_pos = position.add_y(offset);
@@ -242,7 +242,7 @@ pub(crate) mod pawn {
         }
     }
 
-    /// Checks if a [`PAWN`] can move diagonally. Also checks for en passant
+    /// Checks if a [`Pawn`] can move diagonally. Also checks for en passant
     fn pawn_move_side(position: &Position, game: &Game, offset_x: i8, offset_y: i8, valid_positions: &mut Vec<String>) {
 
         let test_pos = position.add(offset_x, offset_y);
