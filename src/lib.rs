@@ -3,16 +3,16 @@
 
 mod tests;
 
-/// Contains definitions of a chess piece and related code
+/// Contains definitions of a chess piece and related code.
 pub mod piece;
 
-/// Contains board logic; accessing and moving pieces and initializing the board
+/// Contains board logic; accessing and moving pieces and initializing the board.
 pub mod board;
 
-/// Contains definition of a chess position and position logic
+/// Contains definition of a chess position and position logic.
 pub mod position;
 
-/// Contains logic for how each chess piece should move
+/// Contains logic for how each chess piece should move.
 pub mod moves;
 
 use std::fmt;
@@ -96,14 +96,14 @@ impl GameTraits for Game {
     }
 
 
-    /// Entry point for moving a piece
-    /// Checks if the [`GameState`] allows for moves to be made. Moves are only allowed during [`Check`] and [`InProgress`]
+    /// Entry point for moving a piece.
+    /// Checks if the [`GameState`] allows for moves to be made. Moves are only allowed during [`Check`] and [`InProgress`].
     ///
-    /// See [`handle_in_progress`] for piece movement logic
+    /// See [`handle_in_progress`] for piece movement logic.
     ///
-    /// Returns [`None`] if the move was illegal or movement wasn't allowed
+    /// Returns [`None`] if the move was illegal or movement wasn't allowed.
     ///
-    /// Calls [`post_turn_check`] to determinate the next [`GameState`]
+    /// Calls [`post_turn_check`] to determinate the next [`GameState`].
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
          let illegal_move = match self.state {
             InProgress => {
@@ -125,11 +125,11 @@ impl GameTraits for Game {
         Some(self.state)
     }
 
-    /// Entry point for making a promotion
-    /// Checks if the [`GameState`] allows for/equals [`Promoting`]
-    /// Checks if the input is valid. See [`get_promotion_type`]
+    /// Entry point for making a promotion.
+    /// Checks if the [`GameState`] allows for/equals [`Promoting`].
+    /// Checks if the input is valid. See [`get_promotion_type`].
     ///
-    /// If the input is valid, promote the piece and do the usual [`post_turn_check`]
+    /// If the input is valid, promote the piece and do the usual [`post_turn_check`].
     fn make_promotion(&mut self, piece: &str) -> Option<GameState> {
         if self.state.eq(&Promoting)  {
            if let Some(piece_type) = get_promotion_type(piece) {
@@ -160,9 +160,9 @@ impl GameTraits for Game {
     }
 
 
-    /// Converts a symbolic representation of a chess position into a [`Position`]. See [`Position::from_symbolic_representation`]
+    /// Converts a symbolic representation of a chess position into a [`Position`]. See [`Position::from_symbolic_representation`].
     ///
-    /// If the [`Position`] contains a [`Piece`] that has the same [`Colour`] as the current turn, check for possible moves. See [`check_possible_moves`]
+    /// If the [`Position`] contains a [`Piece`] that has the same [`Colour`] as the current turn, check for possible moves. See [`check_possible_moves`].
     ///
     /// Returns a [`Vec<String>`] contain the possible moves. Returns an empty [`Vec<String>`] if no possible moves was found.
     fn get_possible_moves(&self, position: &str) -> Vec<String> {
@@ -176,7 +176,7 @@ impl GameTraits for Game {
         }
     }
 
-    /// Converts the game into a fen string
+    /// Converts the game into a fen string.
     fn to_fen(&self) -> String {
         let mut fen = String::new();
 

@@ -10,8 +10,7 @@ mod tests {
     use crate::{GameTraits, create_default_board};
     use std::io;
 
-    // example test
-    // check that game state is in progress after initialization
+    // check that game state is in progress after initialization.
     #[test]
     fn game_in_progress_after_init() {
         let game = Game::new();
@@ -22,7 +21,7 @@ mod tests {
     }
 
 
-    //Checks if the board has been properly initialized
+    //Checks if the board has been properly initialized.
     #[test]
     fn test_board_initialization() {
         let game = Game::new();

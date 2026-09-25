@@ -4,9 +4,9 @@ use crate::piece::Colour::{Black, White};
 use crate::piece::Type::*;
 use crate::position::Position;
 
-/// A struct containing a representation of a chess piece
-/// Holds a [`Type`] e.g. [`Knight`]
-/// Holds a [`Colour`] e.g. [`White`]
+/// A struct containing a representation of a chess piece.
+/// Holds a [`Type`] e.g. [`Knight`].
+/// Holds a [`Colour`] e.g. [`White`].
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Piece {
     piece_type: Type,
@@ -26,8 +26,8 @@ impl Piece {
     }
 
     /// Returns a [`Vec<String>`] of each possible move a piece can do.
-    /// Refers to a function based of the [`Type`]
-    /// See [`moves`] for more details
+    /// Refers to a function based of the [`Type`].
+    /// See [`moves`] for more details.
     pub(crate) fn get_possible_moves(&self, position: &Position, game: &Game) -> Vec<String> {
         match self.piece_type {
             King => moves::king::king_possible_moves(position, game),
@@ -39,8 +39,8 @@ impl Piece {
         }
     }
 
-    /// Converts a [`Type`] into a symbolic representation
-    /// For debug purposes only
+    /// Converts a [`Type`] into a symbolic representation.
+    /// For debug purposes only.
     pub fn get_character_representation(&self) -> char {
         if self.piece_color.eq(&Black) {
             match self.piece_type {

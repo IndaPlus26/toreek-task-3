@@ -74,7 +74,7 @@ impl Position {
     }
 
     /// Converts a traditional symbolic representation of a chess position (e.g. E8) into a [`Position`]
-    ///See [`get_number_from_letter`] for conversion
+    ///See [`get_number_from_letter`] for conversion.
     ///
     /// # Example
     /// ```rust
@@ -88,8 +88,8 @@ impl Position {
         Position::new(get_number_from_letter(symbolic_representation.chars().nth(0).unwrap()), symbolic_representation.chars().nth(1).unwrap().to_digit(10).unwrap() as i8)
     }
 
-    /// Converts a [`Position`] into a symbolic representation
-    ///See [`get_letter_from_number`] for conversion
+    /// Converts a [`Position`] into a symbolic representation.
+    ///See [`get_letter_from_number`] for conversion.
     /// # Example
     /// ```rust
     /// use crate::toreek_task_3::position::Position;

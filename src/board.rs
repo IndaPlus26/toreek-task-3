@@ -14,7 +14,7 @@ impl Game {
         self.board[(position.y - 1) as usize][(position.x - 1) as usize] = piece;
     }
 
-    /// Moves a piece without restrictions. Also resets or increment the [`Game.halfmove_clock`]
+    /// Moves a piece without restrictions. Also resets or increment the [`Game.halfmove_clock`].
     pub(crate) fn move_piece(&mut self, original_position: &Position, new_position: &Position) {
         if self.get_piece_at(original_position).unwrap().get_piece_type().eq(&Pawn) {
             self.halfmove_clock = 0;
@@ -49,18 +49,18 @@ pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
     [Some(Piece::new(Rook, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Queen, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Rook, colour))]
 }
-/// Checks various thing right after a turn
+/// Checks various thing right after a turn.
 ///
-/// Checks if any [`Pawn`] can promote. See [`check_for_promotion`]
+/// Checks if any [`Pawn`] can promote. See [`check_for_promotion`].
 ///
-/// Checks if the opponent is in [`Check`]. See [`check_for_check`]
-/// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`]
+/// Checks if the opponent is in [`Check`]. See [`check_for_check`].
+/// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`].
 ///
-/// If the opponent is in [`Check`] and does not have any legal moves. Set [`game.state`] to [`Checkmate`]
-/// If the opponent isn't in [`Check`] and does not have any legal moves. Set [`game.state`] to [`Stalemate`]
+/// If the opponent is in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Checkmate`].
+/// If the opponent isn't in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Stalemate`].
 ///
-/// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`]
-/// Also increment the [`Game::fullmove_clock`] if applicable
+/// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`].
+/// Also increment the [`Game::fullmove_clock`] if applicable.
 pub(crate) fn post_turn_check(game: &mut Game) {
     if check_for_promotion(game).is_some() {
         game.state = Promoting;
@@ -92,7 +92,7 @@ pub(crate) fn post_turn_check(game: &mut Game) {
 }
 
 
-/// Checks the board for a [`Pawn`] than can promote
+/// Checks the board for a [`Pawn`] than can promote.
 pub(crate) fn check_for_promotion(game: &Game) -> Option<Position> {
     let side = if game.get_turn().eq(&White) {8} else {1};
 
@@ -117,10 +117,10 @@ pub(crate) fn get_promotion_type(piece: &str) -> Option<Type> {
 
 }
 
-/// Checks if the opponent is in [`Check`]
-/// See [`moves::king::king_illegal_moves`]
+/// Checks if the opponent is in [`Check`].
+/// See [`moves::king::king_illegal_moves`].
 ///
-/// Returns true if the opponent [`King`] is in check
+/// Returns true if the opponent [`King`] is in check.
 pub(crate) fn check_for_check(game: &Game) -> bool {
     let mut king_piece_pos: String = "".to_string();
 
@@ -185,11 +185,11 @@ pub(crate) fn handle_en_passant(game: &mut Game, from: &Position, to: &Position)
     }
 }
 
-/// Checks if castling still is allowed. See [`check_castling`]. Also handles a castling move
-/// Returns true if the function handles castling, as it overrides the default movement behavior
+/// Checks if castling still is allowed. See [`check_castling`]. Also handles a castling move.
+/// Returns true if the function handles castling, as it overrides the default movement behavior.
 ///
 /// The function checks for the position of the rook. A castling can both happen from selecting the king or a rook, so we don't know which position contains the rook.
-/// See [`moves::rook::rook_castling`] and [`moves::king::king_castling`]
+/// See [`moves::rook::rook_castling`] and [`moves::king::king_castling`].
 pub(crate) fn handle_castling(game: &mut Game, from: &Position, to: &Position) -> bool {
     let mut king_check = false;
     let mut rook_position: Option<Position> = None;
@@ -248,7 +248,7 @@ pub(crate) fn handle_castling(game: &mut Game, from: &Position, to: &Position) -
     }
 }
 
-/// Checks if castling still is allowed. Checks if a [`Rook`] has moved, and from what [`Position`], and if a king has moved and from what [`Position`]
+/// Checks if castling still is allowed. Checks if a [`Rook`] has moved, and from what [`Position`], and if a king has moved and from what [`Position`].
 pub(crate) fn check_castling(game: &mut Game, from: &Position) {
     if let Some(piece) = game.get_piece_at(from) {
         if piece.get_piece_type().eq(&Rook) {
@@ -280,8 +280,8 @@ pub(crate) fn check_castling(game: &mut Game, from: &Position) {
 }
 
 
-/// Recursively goes through every possible move for every [`Piece`] on the board for the opposite player
-/// Checks if the opponent can do any legal moves. Used to determinate [`Checkmate`] or [`Stalemate`]
+/// Recursively goes through every possible move for every [`Piece`] on the board for the opposite player.
+/// Checks if the opponent can do any legal moves. Used to determinate [`Checkmate`] or [`Stalemate`].
 pub(crate) fn has_opponent_possible_moves(game: &mut Game) -> bool {
     let mut game_test = game.clone();
     game_test.turn = game.get_turn().get_opponent_color();
