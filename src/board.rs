@@ -142,20 +142,28 @@ pub(crate) fn check_for_check(game: &Game) -> bool {
     }
 }
 
-/// Checks if the move is legal, see [`Game::get_possible_moves`]. If true moves the piece, see [`Game::move_piece`] and returns true, else returns false
+/// Checks if the move is legal, see [`Game::get_possible_moves`]. If true moves the piece, see [`handle_move`] and returns true, else returns false.
 pub(crate) fn handle_in_progress(game: &mut Game, from: &str, to: &str) -> bool {
     if game.get_possible_moves(from).contains(&to.to_string()) {
-        let from = Position::from_symbolic_representation(from);
-        let to = Position::from_symbolic_representation(to);
+        handle_move(game, &Position::from_symbolic_representation(from), &Position::from_symbolic_representation(to));
 
-        handle_en_passant(game, &from, &to);
-        game.move_piece(&from, &to);
-
-        false
-    }
-    else {
         true
     }
+    else {
+        false
+    }
+}
+
+/// Checks if an en passant was performed. See [`handle_en_passant`]. This move only removes an additional piece, so we can still move the piece normally.
+/// Checks if a castling was performed. See [`handle_castling`]. If true, we don't want to move the piece normally, as castling provides a different movement pattern.
+///
+/// Else moves a piece normally. See [`Game::move_piece`].
+pub(crate) fn handle_move(game: &mut Game, from: &Position, to: &Position) {
+    handle_en_passant(game, &from, &to);
+    if !handle_castling(game, &from, &to) {
+        game.move_piece(&from, &to);
+    }
+
 }
 
 /// Checks if a move is an en passant, or allows for an en passant next turn.
@@ -177,6 +185,99 @@ pub(crate) fn handle_en_passant(game: &mut Game, from: &Position, to: &Position)
     }
 }
 
+/// Checks if castling still is allowed. See [`check_castling`]. Also handles a castling move
+/// Returns true if the function handles castling, as it overrides the default movement behavior
+///
+/// The function checks for the position of the rook. A castling can both happen from selecting the king or a rook, so we don't know which position contains the rook.
+/// See [`moves::rook::rook_castling`] and [`moves::king::king_castling`]
+pub(crate) fn handle_castling(game: &mut Game, from: &Position, to: &Position) -> bool {
+    let mut king_check = false;
+    let mut rook_position: Option<Position> = None;
+
+    if let Some(from_king) = game.get_piece_at(from) && from_king.get_piece_type().eq(&King) && from_king.get_piece_color().eq(&game.get_turn()) {
+        king_check = true;
+    }
+    else if let Some(to_king) = game.get_piece_at(to) && to_king.get_piece_type().eq(&King) && to_king.get_piece_color().eq(&game.get_turn()){
+        king_check = true;
+    }
+
+    if let Some(from_rook) = game.get_piece_at(from) && from_rook.get_piece_type().eq(&ROOK) && from_rook.get_piece_color().eq(&game.get_turn()) {
+        rook_position = Some(*from);
+    }
+    else if let Some(to_rook) = game.get_piece_at(to) && to_rook.get_piece_type().eq(&ROOK) && to_rook.get_piece_color().eq(&game.get_turn()) {
+        rook_position = Some(*to);
+    }
+
+    if let Some(position) = rook_position && king_check {
+        if position.eq(&Position::new(1, 1)) {
+            game.move_piece(&position, &Position::new(4, 1)); //Move rook
+            game.move_piece(&Position::new(5, 1), &Position::new(3, 1)); //Move kin
+
+            game.castling_king_white = false;
+            game.castling_queen_white = false;
+        }
+        else if position.eq(&Position::new(8, 1)) {
+            game.move_piece(&position, &Position::new(6, 1)); //Move rook
+            game.move_piece(&Position::new(5, 1), &Position::new(7, 1)); //Move king
+
+            game.castling_king_white = false;
+            game.castling_queen_white = false;
+        }
+
+        else if position.eq(&Position::new(1, 8)) {
+            game.move_piece(&position, &Position::new(4, 8)); //Move rook
+            game.move_piece(&Position::new(5, 8), &Position::new(3, 8)); //Move king
+
+            game.castling_king_black = false;
+            game.castling_queen_black = false;
+        }
+        else if position.eq(&Position::new(8, 8)) {
+            game.move_piece(&position, &Position::new(6, 8)); //Move rook
+            game.move_piece(&Position::new(5, 8), &Position::new(7, 8)); //Move king
+
+            game.castling_king_black = false;
+            game.castling_queen_black = false;
+        }
+
+        game.halfmove_clock -=1; //We move two pieces.
+        true
+    }
+    else {
+        check_castling(game, from);
+        false
+    }
+}
+
+/// Checks if castling still is allowed. Checks if a [`ROOK`] has moved, and from what [`Position`], and if a king has moved and from what [`Position`]
+pub(crate) fn check_castling(game: &mut Game, from: &Position) {
+    if let Some(piece) = game.get_piece_at(from) {
+        if piece.get_piece_type().eq(&ROOK) {
+            if from.eq(&Position::new(1, 1)) {
+                game.castling_queen_white = false;
+            } else if from.eq(&Position::new(8, 1)) {
+                game.castling_king_white = false;
+
+            }
+            if from.eq(&Position::new(1, 8)) {
+                game.castling_queen_black = false;
+
+            } else if from.eq(&Position::new(8, 8)) {
+                game.castling_king_black = false;
+            }
+        } else if piece.get_piece_type().eq(&King) {
+            if from.eq(&Position::new(5, 1)) {
+
+                game.castling_king_white = false;
+                game.castling_queen_white = false;
+            }
+            else if from.eq(&Position::new(5, 8)) {
+
+                game.castling_king_black = false;
+                game.castling_queen_black = false;
+            }
+        }
+    }
+}
 
 
 /// Recursively goes through every possible move for every [`Piece`] on the board for the opposite player
@@ -197,13 +298,13 @@ pub(crate) fn has_opponent_possible_moves(game: &mut Game) -> bool {
     false
 }
 
-/// Checks if a [`Piece`] has any legal moves on a specific [`Position`]
+/// Checks if a [`Piece`] has any legal moves on a specific [`Position`].
 ///
-/// Gets all moves a [`Piece`] can do, see [`Piece::get_possible_moves`] for per [`Type`] logic
+/// Gets all moves a [`Piece`] can do, see [`Piece::get_possible_moves`] for per [`Type`] logic.
 ///
-/// Checks if any moves puts the own [`King`] into check. See [`check_for_check`]
-/// Moves that puts the own [`King`] into check are considered illegal and are not added to the final [`Vec<String>`] of allowed_moves
-/// Returns a [`Vec<String>`] of all legal moves a [`Piece`] can do
+/// Checks if any moves puts the own [`King`] into check. See [`handle_move`] and [`check_for_check`].
+/// Moves that puts the own [`King`] into check are considered illegal and are not added to the final [`Vec<String>`] of allowed_moves.
+/// Returns a [`Vec<String>`] of all legal moves a [`Piece`] can do.
 pub(crate) fn check_possible_moves(position: &Position, game: &Game, piece: &Piece) -> Vec<String> {
     let mut allowed_moves: Vec<String> = vec![];
 
@@ -211,9 +312,9 @@ pub(crate) fn check_possible_moves(position: &Position, game: &Game, piece: &Pie
 
         let mut game_test = game.clone();
 
-        game_test.turn = game.get_turn().get_opponent_color();
-        game_test.move_piece(position, &Position::from_symbolic_representation(&*moves));
+        handle_move(&mut game_test, position, &Position::from_symbolic_representation(&*moves));
 
+        game_test.turn = game.get_turn().get_opponent_color();
         if !check_for_check(&game_test) {
 
             if !allowed_moves.contains(&moves) {

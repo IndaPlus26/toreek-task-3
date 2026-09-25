@@ -34,7 +34,7 @@ mod tests {
     fn test_fen() {
         let game = Game::new();
 
-        assert_eq!(game.to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");
+        assert_eq!(game.to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 
 
@@ -46,8 +46,8 @@ mod tests {
         println!();
 
         while game.state.eq(&GameState::InProgress) || game.state.eq(&GameState::Check) || game.state.eq(&GameState::Promoting) {
-            
-            
+
+
             if game.state.eq(&GameState::Promoting) {
                 print!("Select piece type to promote: ");
                 let piece_type = get_player_input("Please select a piece type (K, P, R, etc): ");

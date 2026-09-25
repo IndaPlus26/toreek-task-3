@@ -70,7 +70,12 @@ pub struct Game {
     board: [[Option<Piece>; 8]; 8],
     halfmove_clock: u8,
     fullmove_counter: u32,
-    en_passant_position: Option<Position>
+
+    en_passant_position: Option<Position>,
+    castling_queen_white: bool,
+    castling_queen_black: bool,
+    castling_king_black: bool,
+    castling_king_white: bool
 }
 
 impl GameTraits for Game {
@@ -82,7 +87,11 @@ impl GameTraits for Game {
             halfmove_clock: 0,
             fullmove_counter: 1,
 
-            en_passant_position: None
+            en_passant_position: None,
+            castling_queen_white: true,
+            castling_queen_black: true,
+            castling_king_black: true,
+            castling_king_white: true
         }
     }
 
@@ -98,10 +107,10 @@ impl GameTraits for Game {
     fn make_move(&mut self, from: &str, to: &str) -> Option<GameState> {
          let illegal_move = match self.state {
             InProgress => {
-                handle_in_progress(self, from, to)
+                !handle_in_progress(self, from, to)
             }
             Check => {
-                handle_in_progress(self, from, to)
+                !handle_in_progress(self, from, to)
             }
             _ => {
                 true
@@ -202,9 +211,27 @@ impl GameTraits for Game {
         fen.push(' ');
         fen.push(if self.get_turn().eq(&White) {'w'} else {'b'});
 
-        //Castling/unimplemented
-        fen.push_str(" -");
+        //Castling
+        fen.push(' ');
+        if self.castling_queen_black || self.castling_king_black || self.castling_queen_white || self.castling_king_white {
+            if self.castling_king_black {
+                fen.push('K')
+            }
+            if self.castling_queen_black {
+                fen.push('Q')
+            }
+            if self.castling_king_white {
+                fen.push('k')
+            }
+            if self.castling_queen_white {
+                fen.push('q')
+            }
 
+        }
+        else {
+            fen.push('-');
+        }
+        
         //En passant
         fen.push(' ');
         if let Some(position) = &self.en_passant_position {

@@ -11,17 +11,10 @@ pub(crate) mod king {
 
     /// Entry point for [`King`] move pattern logic
     ///
-    /// "Illegal" moves are considered moves that puts the king into a threatening position. See [`king_illegal_moves`]
-    /// Subtracts the [`king_illegal_moves`] from the kings default move pattern.
-    /// For default move pattern, see [`king_moves`]
-    ///
     /// Returns a [`Vec<String>`] of the possible moves for type [`King`]
     pub(crate) fn king_possible_moves(position: &Position, game: &Game) -> Vec<String> {
         let mut moves = king_moves(position, game);
-
-        for illegal_move in king_illegal_moves(game, &game.get_turn().get_opponent_color()) {
-            moves.retain(|x| !x.eq(&illegal_move));
-        }
+        king_castling(game, &mut moves);
 
         moves
     }
@@ -32,7 +25,6 @@ pub(crate) mod king {
     /// Loops every [`Position`] of [`crate::Game::board`]
     /// Checks for [`Piece`] of opposite [`Colour`]
     ///
-    /// If the [`Piece`] is a [`King`] check the positions around the king. See [`king_moves`]. We can't reuse [`Piece::get_possible_moves`] as it would refer to this metod, resulting in a loop.
     /// If the [`Piece`] is a [`PAWN`] check the positions diagonally in front of the [`PAWN`].  We can't reuse [`Piece::get_possible_moves`] as the default move pattern doesn't neccessarely threaten other pieces.
     /// If the [`Piece`] is any other piece, get their possible moves from [`Piece::get_possible_moves`]
     pub(crate) fn king_illegal_moves(game: &Game, checked_color: &Colour) -> Vec<String> {
@@ -74,6 +66,33 @@ pub(crate) mod king {
 
         positions
     }
+
+
+    pub(crate) fn king_castling(game: &Game, valid_positions:  &mut Vec<String>) {
+        if game.get_turn().eq(&White) {
+            if game.castling_queen_white {
+                if game.get_piece_at(&Position::new(2, 1)).is_none() && game.get_piece_at(&Position::new(3, 1)).is_none() && game.get_piece_at(&Position::new(4, 1)).is_none() {
+                    valid_positions.push(Position::new(1, 1).to_symbolic_representation())
+                }
+            }
+            if game.castling_king_white {
+                if game.get_piece_at(&Position::new(7, 1)).is_none() && game.get_piece_at(&Position::new(6, 1)).is_none() {
+                    valid_positions.push(Position::new(8, 1).to_symbolic_representation())
+                }
+            }
+        } else {
+            if game.castling_queen_black {
+                if game.get_piece_at(&Position::new(2, 8)).is_none() && game.get_piece_at(&Position::new(3, 8)).is_none() && game.get_piece_at(&Position::new(4, 8)).is_none() {
+                    valid_positions.push(Position::new(1, 8).to_symbolic_representation())
+                }
+            }
+            if game.castling_king_black {
+                if game.get_piece_at(&Position::new(7, 8)).is_none() && game.get_piece_at(&Position::new(6, 8)).is_none() {
+                    valid_positions.push(Position::new(8, 8).to_symbolic_representation())
+                }
+            }
+        }
+    }
 }
 
 pub(crate) mod queen {
@@ -107,12 +126,38 @@ pub(crate) mod rook {
                 }
             }
         }
+        rook_castling(position, game, &mut valid_positions);
 
         valid_positions
     }
+
+    /// Handles castling. Just an if soup, nothing of interest to see here
+    pub(crate) fn rook_castling(position: &Position, game: &Game, valid_positions:  &mut Vec<String>) {
+        if game.get_turn().eq(&White) {
+            if position.eq(&Position::new(1, 1)) && game.castling_queen_white {
+                if game.get_piece_at(&Position::new(2, 1)).is_none() && game.get_piece_at(&Position::new(3, 1)).is_none() && game.get_piece_at(&Position::new(4, 1)).is_none() {
+                    valid_positions.push(Position::new(5, 1).to_symbolic_representation())
+                }
+            } else if position.eq(&Position::new(8, 1)) && game.castling_king_white {
+                if game.get_piece_at(&Position::new(7, 1)).is_none() && game.get_piece_at(&Position::new(6, 1)).is_none() {
+                    valid_positions.push(Position::new(5, 1).to_symbolic_representation())
+                }
+            }
+        }
+        else {
+            if position.eq(&Position::new(1, 8)) && game.castling_queen_black {
+                if game.get_piece_at(&Position::new(2, 8)).is_none() && game.get_piece_at(&Position::new(3, 8)).is_none() && game.get_piece_at(&Position::new(4, 8)).is_none() {
+                    valid_positions.push(Position::new(5, 8).to_symbolic_representation())
+                }
+            } else if position.eq(&Position::new(8, 8)) && game.castling_king_black {
+                if game.get_piece_at(&Position::new(7, 8)).is_none() && game.get_piece_at(&Position::new(6, 8)).is_none() {
+                    valid_positions.push(Position::new(5, 8).to_symbolic_representation())
+                }
+            }
+        }
+
+    }
 }
-
-
 pub(crate) mod bishop {
     use super::*;
 
@@ -180,7 +225,7 @@ pub(crate) mod pawn {
 
         pawn_move_side(position, game, 1, color_multiplier, &mut valid_positions);
         pawn_move_side(position, game, -1, color_multiplier, &mut valid_positions);
-        
+
         valid_positions
     }
 
