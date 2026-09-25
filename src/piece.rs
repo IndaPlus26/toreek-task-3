@@ -1,8 +1,8 @@
-use crate::{Game};
 use crate::moves;
 use crate::piece::Colour::{Black, White};
 use crate::piece::Type::*;
 use crate::position::Position;
+use crate::Game;
 
 /// A struct containing a representation of a chess piece.
 /// Holds a [`Type`] e.g. [`Knight`].

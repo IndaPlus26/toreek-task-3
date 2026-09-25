@@ -15,12 +15,12 @@ pub mod position;
 /// Contains logic for how each chess piece should move.
 pub mod moves;
 
-use std::fmt;
-use crate::board::*;
 use crate::GameState::*;
-use crate::piece::*;
+use crate::board::*;
 use crate::piece::Colour::White;
-use crate::position::{Position};
+use crate::piece::*;
+use crate::position::Position;
+use std::fmt;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GameState {

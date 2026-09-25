@@ -5,8 +5,8 @@
 mod tests {
     use crate::Game;
     use crate::GameState;
-    use crate::position::*;
     use crate::piece::Colour;
+    use crate::position::*;
     use crate::{GameTraits, create_default_board};
     use std::io;
 

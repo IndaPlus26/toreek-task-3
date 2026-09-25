@@ -1,6 +1,6 @@
 use crate::GameState::{Check, Checkmate, InProgress, Promoting, Stalemate};
 use crate::piece::Colour::{Black, White};
-use crate::piece::Type::{King, Bishop, Pawn, Queen, Rook, Knight};
+use crate::piece::Type::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::piece::{Colour, Piece, Type};
 use crate::position::Position;
 use crate::{Game, GameTraits, moves};
@@ -49,48 +49,6 @@ pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
     [Some(Piece::new(Rook, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Queen, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Rook, colour))]
 }
-/// Checks various thing right after a turn.
-///
-/// Checks if any [`Pawn`] can promote. See [`check_for_promotion`].
-///
-/// Checks if the opponent is in [`Check`]. See [`check_for_check`].
-/// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`].
-///
-/// If the opponent is in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Checkmate`].
-/// If the opponent isn't in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Stalemate`].
-///
-/// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`].
-/// Also increment the [`Game::fullmove_clock`] if applicable.
-pub(crate) fn post_turn_check(game: &mut Game) {
-    if check_for_promotion(game).is_some() {
-        game.state = Promoting;
-        return;
-    }
-
-    game.state = if check_for_check(game) {Check} else {InProgress};
-    if !has_opponent_possible_moves(game) {
-        if game.state.eq(&Check) {
-            game.state = Checkmate;
-        }
-        else {
-            game.state = Stalemate;
-        }
-
-    }
-
-    if game.halfmove_clock >= 100 {
-        game.state = Stalemate;
-    }
-
-    if game.get_game_state().eq(&InProgress) || game.get_game_state().eq(&Check) {
-        if game.get_turn().eq(&Black) {
-            game.fullmove_counter += 1;
-        }
-
-        game.turn = game.turn.get_opponent_color();
-    }
-}
-
 
 /// Checks the board for a [`Pawn`] than can promote.
 pub(crate) fn check_for_promotion(game: &Game) -> Option<Position> {
@@ -279,6 +237,47 @@ pub(crate) fn check_castling(game: &mut Game, from: &Position) {
     }
 }
 
+/// Checks various thing right after a turn.
+///
+/// Checks if any [`Pawn`] can promote. See [`check_for_promotion`].
+///
+/// Checks if the opponent is in [`Check`]. See [`check_for_check`].
+/// Checks if the opponent can do any legal moves. See [`has_opponent_possible_moves`].
+///
+/// If the opponent is in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Checkmate`].
+/// If the opponent isn't in [`Check`] and does not have any legal moves. If true set [`game.state`] to [`Stalemate`].
+///
+/// If the opponent can do any legal move, continues the game and changes turn. See [`Colour::get_opponent_color`].
+/// Also increment the [`Game::fullmove_clock`] if applicable.
+pub(crate) fn post_turn_check(game: &mut Game) {
+    if check_for_promotion(game).is_some() {
+        game.state = Promoting;
+        return;
+    }
+
+    game.state = if check_for_check(game) {Check} else {InProgress};
+    if !has_opponent_possible_moves(game) {
+        if game.state.eq(&Check) {
+            game.state = Checkmate;
+        }
+        else {
+            game.state = Stalemate;
+        }
+
+    }
+
+    if game.halfmove_clock >= 100 {
+        game.state = Stalemate;
+    }
+
+    if game.get_game_state().eq(&InProgress) || game.get_game_state().eq(&Check) {
+        if game.get_turn().eq(&Black) {
+            game.fullmove_counter += 1;
+        }
+
+        game.turn = game.turn.get_opponent_color();
+    }
+}
 
 /// Recursively goes through every possible move for every [`Piece`] on the board for the opposite player.
 /// Checks if the opponent can do any legal moves. Used to determinate [`Checkmate`] or [`Stalemate`].

@@ -1,13 +1,13 @@
-use crate::{Game, GameTraits};
 use crate::piece::Colour::*;
 use crate::piece::Type::*;
 use crate::position::Position;
+use crate::{Game, GameTraits};
 
 /// Contains the logic behind the move pattern for type [`King`].
 /// See [`king_possible_moves`] for entry point.
 pub(crate) mod king {
-    use crate::piece::Colour;
     use super::*;
+    use crate::piece::Colour;
 
     /// Entry point for [`King`] move pattern logic.
     ///
