@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["pawn_move_side","pawn_move_straight","pawn_possible_moves"]};

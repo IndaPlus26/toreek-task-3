@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["rook_castling","rook_possible_moves"]};

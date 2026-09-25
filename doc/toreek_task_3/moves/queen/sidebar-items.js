@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["queen_possible_moves"]};

@@ -1,0 +1,9 @@
+(function() {
+    const implementors = Object.fromEntries([["toreek_task_3",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"enum\" href=\"toreek_task_3/piece/enum.Colour.html\" title=\"enum toreek_task_3::piece::Colour\">Colour</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"toreek_task_3/struct.Game.html\" title=\"struct toreek_task_3::Game\">Game</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"enum\" href=\"toreek_task_3/enum.GameState.html\" title=\"enum toreek_task_3::GameState\">GameState</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"toreek_task_3/piece/struct.Piece.html\" title=\"struct toreek_task_3::piece::Piece\">Piece</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"struct\" href=\"toreek_task_3/position/struct.Position.html\" title=\"struct toreek_task_3::position::Position\">Position</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.1/core/clone/trait.Clone.html\" title=\"trait core::clone::Clone\">Clone</a> for <a class=\"enum\" href=\"toreek_task_3/piece/enum.Type.html\" title=\"enum toreek_task_3::piece::Type\">Type</a>",0]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":59,"fragment_lengths":[1625]}

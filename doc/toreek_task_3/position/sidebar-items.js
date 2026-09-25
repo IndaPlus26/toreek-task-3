@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_letter_from_number","get_number_from_letter"],"struct":["Position"]};

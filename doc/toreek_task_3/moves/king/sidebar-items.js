@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["king_castling","king_illegal_moves","king_moves","king_possible_moves"]};

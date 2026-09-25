@@ -1,5 +1,5 @@
 # toreek-task-3
-A (mostly) feature complete chess library 
+A feature complete chess library 
 
 ## Language installation instructions
 Follow the official install instruction:
@@ -24,5 +24,4 @@ cargo test -- --nocapture --test-threads=1
 - Castling and en passant remain unimplemented
 
 ## Docs
-### TODO
-Include a link to the html file that ex. `cargo doc` generates and if that's not possible, show clear steps (copy-pastable if possible) as how to get access to the docs. If you don't have a seperate doc then write the docs in this section.
+

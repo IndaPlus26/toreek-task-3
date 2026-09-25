@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["GameState"],"mod":["board","moves","piece","position","tests"],"struct":["Game"],"trait":["GameTraits"]};

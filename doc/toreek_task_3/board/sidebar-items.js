@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["check_castling","check_for_check","check_for_promotion","check_possible_moves","create_default_board","create_first_layer_piece_row","get_promotion_type","handle_castling","handle_en_passant","handle_in_progress","handle_move","has_opponent_possible_moves","post_turn_check"]};

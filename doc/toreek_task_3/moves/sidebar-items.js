@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["add_position_if_valid"],"mod":["bishop","king","knight","pawn","queen","rook"]};

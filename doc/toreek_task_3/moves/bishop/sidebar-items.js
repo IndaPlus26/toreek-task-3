@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["bishop_possible_moves"]};
