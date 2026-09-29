@@ -86,7 +86,7 @@ impl Piece {
 
 
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Type {
     King,
     Queen,
@@ -96,7 +96,7 @@ pub enum Type {
     Pawn
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Colour {
     White,
     Black,
