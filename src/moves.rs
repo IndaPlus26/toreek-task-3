@@ -234,8 +234,7 @@ pub(crate) mod pawn {
 
         let test_pos = position.add_y(offset);
         if !test_pos.is_enemy_piece_at(game) {
-            add_position_if_valid(&test_pos, game, valid_positions);
-            true
+            add_position_if_valid(&test_pos, game, valid_positions)
         }
         else {
             false
