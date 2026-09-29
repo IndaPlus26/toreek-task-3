@@ -9,6 +9,7 @@ mod tests {
     use crate::position::*;
     use crate::{GameTraits, create_default_board};
     use std::io;
+    use crate::board::handle_move;
 
     // check that game state is in progress after initialization.
     #[test]
@@ -323,6 +324,69 @@ mod tests {
         assert_eq!(game.to_fen(), "rnbk1bnr/pppp1ppp/8/4Q3/4q3/P7/1PPP1PPP/RNBK1BNR b - - 1 5")
     }
 
+    #[test]
+    fn test_checkmate() {
+        let mut game = Game::new();
+        game.make_move("F2","F3");
+        game.make_move("E7","E5");
+        game.make_move("G2","G4");
+        game.make_move("D8","H4");
+
+        assert_eq!(GameState::Checkmate, game.get_game_state());
+        assert_eq!(game.to_fen(), "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR b KQkq - 1 2")
+    }
+
+    #[test]
+    fn test_stalemate() {
+        let mut game = Game::new();
+        game.make_move("E2","E3");
+        game.make_move("A7","A5");
+
+        game.make_move("D1","H5");
+        game.make_move("A8","A6");
+
+        game.make_move("H5","A5");
+        game.make_move("H7","H5");
+
+        game.make_move("A5","C7");
+        game.make_move("A6","H6");
+
+        game.make_move("H2","H4");
+        game.make_move("F7","F6");
+
+        game.make_move("C7","D7");
+        game.make_move("E8","F7");
+
+        game.make_move("D7","B7");
+        game.make_move("D8","D3");
+
+        game.make_move("B7","B8");
+        game.make_move("D3","H7");
+
+        game.make_move("B8","C8");
+        game.make_move("F7","G6");
+
+        game.make_move("C8","E6");
+
+        print_board_and_possible_moves(&game, &vec![]);
+
+        assert_eq!(GameState::Stalemate, game.get_game_state());
+        assert_eq!(game.to_fen(), "5bnr/4p1pq/4Qpkr/7p/7P/4P3/PPPP1PP1/RNB1KBNR w KQ - 2 10")
+    }
+
+    #[test]
+    fn test_stalemate_50_move_rule() {
+        let mut game = Game::new();
+
+        for i in 0..25 {
+            game.make_move("B1","C3");
+            game.make_move("B8","C6");
+            game.make_move("C3","B1");
+            game.make_move("C6","B8");
+        }
+
+        assert_eq!(GameState::Stalemate, game.get_game_state());
+    }
 
     //Test game loop
     //#[test]
