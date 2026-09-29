@@ -214,16 +214,16 @@ impl GameTraits for Game {
         //Castling
         fen.push(' ');
         if self.castling_queen_black || self.castling_king_black || self.castling_queen_white || self.castling_king_white {
-            if self.castling_king_black {
+            if self.castling_king_white {
                 fen.push('K')
             }
-            if self.castling_queen_black {
+            if self.castling_queen_white {
                 fen.push('Q')
             }
-            if self.castling_king_white {
+            if self.castling_king_black {
                 fen.push('k')
             }
-            if self.castling_queen_white {
+            if self.castling_queen_black {
                 fen.push('q')
             }
 
