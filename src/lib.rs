@@ -235,7 +235,7 @@ impl GameTraits for Game {
         //En passant
         fen.push(' ');
         if let Some(position) = &self.en_passant_position {
-            fen.push_str(&*position.to_symbolic_representation());
+            fen.push_str(&*position.to_symbolic_representation().to_ascii_lowercase());
         }
         else {
             fen.push('-');
