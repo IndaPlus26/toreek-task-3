@@ -3,9 +3,9 @@
 // --------------------------
 #[cfg(test)]
 mod tests {
-    use crate::Game;
+    use crate::{piece, Game};
     use crate::GameState;
-    use crate::piece::Colour;
+    use crate::piece::*;
     use crate::position::*;
     use crate::{GameTraits, create_default_board};
     use std::io;
@@ -368,10 +368,39 @@ mod tests {
 
         game.make_move("C8","E6");
 
-        print_board_and_possible_moves(&game, &vec![]);
-
         assert_eq!(GameState::Stalemate, game.get_game_state());
         assert_eq!(game.to_fen(), "5bnr/4p1pq/4Qpkr/7p/7P/4P3/PPPP1PP1/RNB1KBNR w KQ - 2 10")
+    }
+
+    #[test]
+    fn test_promotion() {
+        let mut game = Game::new();
+        game.make_move("D2","D4");
+        game.make_move("A7","A5");
+
+
+        game.make_move("D4","D5");
+        game.make_move("A5","A4");
+
+        game.make_move("D5","D6");
+        game.make_move("A4","A3");
+
+        game.make_move("D6","C7");
+        game.make_move("A3","B2");
+
+        game.make_move("C7","B8");
+
+        assert_eq!(GameState::Promoting, game.get_game_state());
+        game.make_promotion("Q");
+        assert_eq!(Piece::new(Type::Queen, Colour::White), game.get_piece_at(&Position::new(2, 8)).unwrap());
+
+        game.make_move("B2","A1");
+
+        assert_eq!(GameState::Promoting, game.get_game_state());
+        game.make_promotion("N");
+        assert_eq!(Piece::new(Type::Knight, Colour::Black), game.get_piece_at(&Position::new(1, 1)).unwrap());
+
+
     }
 
     #[test]
