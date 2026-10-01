@@ -6,10 +6,14 @@ use crate::position::Position;
 use crate::{Game, GameTraits, moves};
 
 impl Game {
-    pub(crate) fn get_piece_at(&self, position: &Position) -> Option<Piece> {
+
+    /// Gets a [`Option<Piece>`] piece from a [`Position`] on the board.
+    /// Returns [`None`] if the position is empty.
+    pub fn get_piece_at(&self, position: &Position) -> Option<Piece> {
         self.board[(position.y - 1) as usize][(position.x - 1) as usize]
     }
 
+    /// Sets a [`Option<Piece>`] at a position without restriction.
     pub(crate) fn set_piece_at(&mut self, position: &Position, piece: Option<Piece> )  {
         self.board[(position.y - 1) as usize][(position.x - 1) as usize] = piece;
     }
@@ -33,6 +37,7 @@ impl Game {
     }
 }
 
+/// Used to initialize each piece on the board.
 pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
     [
         create_first_layer_piece_row(White),
@@ -46,11 +51,12 @@ pub(crate) fn create_default_board() -> [[Option<Piece>; 8]; 8] {
     ]
 }
 
+/// Creates a row for the first and eight column at the start of the game.
 fn create_first_layer_piece_row(colour: Colour) -> [Option<Piece>; 8] {
-    [Some(Piece::new(Rook, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Queen, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Type::Bishop, colour)), Some(Piece::new(Type::Knight, colour)), Some(Piece::new(Type::Rook, colour))]
+    [Some(Piece::new(Rook, colour)), Some(Piece::new(Knight, colour)), Some(Piece::new(Bishop, colour)), Some(Piece::new(Queen, colour)), Some(Piece::new(King, colour)), Some(Piece::new(Bishop, colour)), Some(Piece::new(Knight, colour)), Some(Piece::new(Rook, colour))]
 }
 
-/// Checks the board for a [`Pawn`] than can promote.
+/// Checks the board for a [`Pawn`] that can promote.
 pub(crate) fn check_for_promotion(game: &Game) -> Option<Position> {
     let side = if game.get_turn().eq(&White) {8} else {1};
 
