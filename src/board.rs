@@ -20,7 +20,7 @@ impl Game {
 
     /// Moves a piece without restrictions. Also resets or increment the [`Game.halfmove_clock`].
     pub(crate) fn move_piece(&mut self, original_position: &Position, new_position: &Position) {
-        if self.get_piece_at(original_position).unwrap().get_piece_type().eq(&Pawn) {
+        if let Some(piece) = self.get_piece_at(original_position) && piece.get_piece_type().eq(&Pawn) {
             self.halfmove_clock = 0;
         }
         else if self.get_piece_at(new_position).is_some() {
