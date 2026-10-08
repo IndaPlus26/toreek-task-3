@@ -14,14 +14,14 @@ pub struct Piece {
 }
 
 impl Piece {
-    pub(crate) fn new(piece_type: Type, piece_color: Colour) -> Piece {
+    pub fn new(piece_type: Type, piece_color: Colour) -> Piece {
         Piece { piece_type, piece_color }
     }
-    pub(crate) fn get_piece_type(&self) -> Type {
+    pub fn get_piece_type(&self) -> Type {
         self.piece_type
     }
 
-    pub(crate) fn get_piece_color(&self) -> Colour {
+    pub fn get_piece_color(&self) -> Colour {
         self.piece_color
     }
 
