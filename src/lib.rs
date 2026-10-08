@@ -251,6 +251,75 @@ impl GameTraits for Game {
     }
 }
 
+pub fn from_fen(fen: &str) -> Game {
+    let mut game = Game::new();
+
+    let mut split = fen.split_whitespace();
+
+    let board_string = split.next().unwrap();
+    let mut tmp_board: [[Option<Piece>; 8]; 8] = [[None; 8]; 8];
+
+    let mut y = 7;
+    for  str in board_string.split('/') {
+        let mut pos = 0;
+
+        for character in str.chars() {
+            if character.is_numeric() {
+                pos += character.to_digit(10).unwrap();
+            }
+            else {
+                tmp_board[y][pos as usize] = char_to_fen_representation(character);
+
+                pos += 1;
+            }
+
+        }
+        y = y.wrapping_sub(1);
+    }
+    game.board = tmp_board;
+
+    let tmp_color = split.next().unwrap();
+    game.turn = if tmp_color.eq("w") {White} else {Colour::Black};
+
+    let tmp_castling = split.next().unwrap();
+    if tmp_castling.contains('K') {
+        game.castling_king_white = true;
+    }
+    else {
+        game.castling_king_white = false;
+    }
+    if tmp_castling.contains('Q') {
+        game.castling_queen_white = true;
+    }
+    else {
+        game.castling_queen_white = false;
+    }
+    if tmp_castling.contains('k') {
+        game.castling_king_black = true;
+    }
+    else {
+        game.castling_king_black = false;
+    }
+    if tmp_castling.contains('Q') {
+        game.castling_queen_black = true;
+    }
+    else {
+        game.castling_queen_black = false;
+    }
+
+    let tmp_en_passant = split.next().unwrap();
+    if !tmp_en_passant.eq("-") {
+        game.en_passant_position = Some(Position::from_symbolic_representation(tmp_en_passant));
+    }
+
+    let tmp_half_move_clock = split.next().unwrap();
+    game.halfmove_clock = tmp_half_move_clock.parse::<u8>().unwrap();
+
+    let full_move_clock = split.next().unwrap();
+    game.fullmove_counter = full_move_clock.parse::<u32>().unwrap();
+    
+    game
+}
 
 /// Implement print routine for Game.
 ///

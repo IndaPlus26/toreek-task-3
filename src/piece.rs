@@ -83,7 +83,22 @@ impl Piece {
     }
 }
 
+pub fn char_to_fen_representation(character: char) -> Option<Piece> {
 
+    let piece_type: Type = match character.to_ascii_uppercase() {
+        'P' => Pawn,
+        'R' => Rook,
+        'N' => Knight,
+        'B' => Bishop,
+        'K' => King,
+        'Q' => Queen,
+        _ => {return None;}
+    };
+
+    let piece_color = if character.is_ascii_uppercase() {Colour::White} else {Colour::Black};
+
+    Some(Piece{piece_type, piece_color})
+}
 
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
